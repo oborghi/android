@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Cotação e Tempo</string>
+    <string name="quotation_url">http://developers.agenciaideias.com.br/cotacoes/json</string>
+    <string name="quotation_type">Indefinida</string>
+    <string name="quotation_value">Valor:</string>
+    <string name="quotation_variation">Variação:</string>
+    <string name="get_quotation">Atualizar</string>
+    <string name="dialog_attention">Atenção</string>
+    <string name="dialog_wait">Aguarde</string>
+    <string name="dialog_wait_message">Por Favor Aguarde...</string>
+    <string name="dialog_get_quotation_error">Não foi possivel acessar as informções de cotação...</string>
+</resources>
