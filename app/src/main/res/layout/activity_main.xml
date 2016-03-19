@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:gravity="top|center_horizontal"
         android:layout_alignParentEnd="false"
-        android:layout_marginBottom="60dp">
+        android:layout_marginBottom="70dp">
 
         <ListView
             android:layout_width="wrap_content"
@@ -34,19 +34,22 @@
             android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:gravity="bottom|center_horizontal">
+            android:gravity="center_vertical">
 
-            <Button
+            <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/get_quotation"
-                android:id="@+id/buttonGetQuotation"
+                android:id="@+id/buttonUpdate"
+                android:background="@drawable/refresh_button"
                 android:clickable="true"
-                android:onClick="getQuotation"
-                android:singleLine="false"
-                android:background="@color/button_background"
-                android:textColor="@color/button_foreground" />
+                android:onClick="getQuotation" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="@string/warning_message"
+                android:id="@+id/labelWarning" />
         </LinearLayout>
 
     </LinearLayout>

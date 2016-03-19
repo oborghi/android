@@ -9,4 +9,5 @@
     <string name="dialog_wait">Aguarde</string>
     <string name="dialog_wait_message">Por Favor Aguarde...</string>
     <string name="dialog_get_quotation_error">Não foi possivel acessar as informções de cotação...</string>
+    <string name="warning_message">*Os Valores são atualizados automáticamente a cada 5 minutos.</string>
 </resources>

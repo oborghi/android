@@ -3,7 +3,7 @@ package com.leprechaun.quotationandweather;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 
 import com.leprechaun.quotationandweather.request.DownloadQuotationData;
@@ -13,7 +13,7 @@ import java.util.TimerTask;
 
 public class QuotationActivity extends AppCompatActivity {
 
-    private Button buttonGetQuotation;
+    private ImageButton buttonUpdate;
     private ListView listQuotation;
 
     private static QuotationActivity quotationActivity;
@@ -27,7 +27,7 @@ public class QuotationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        buttonGetQuotation = (Button) findViewById(R.id.buttonGetQuotation);
+        buttonUpdate = (ImageButton) findViewById(R.id.buttonUpdate);
         listQuotation = (ListView) findViewById(R.id.listQuotation);
 
         quotationActivity = this;
