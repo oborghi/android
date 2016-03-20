@@ -27,7 +27,6 @@ public class DownloadLocationData extends AsyncTask<String, Void, String> {
 
     private WeatherActivity activity;
 
-
     public DownloadLocationData(WeatherActivity activity){
         this.activity = activity;
     }
