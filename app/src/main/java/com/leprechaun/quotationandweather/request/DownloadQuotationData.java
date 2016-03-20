@@ -30,15 +30,15 @@ public class DownloadQuotationData extends AsyncTask<String, Void, List<Quotatio
     QuotationActivity activity;
     Boolean showDialog;
 
-    public DownloadQuotationData(Boolean showDialog)
+    public DownloadQuotationData(QuotationActivity activity, Boolean showDialog)
     {
         this.showDialog = showDialog;
+        this.activity = activity;
     }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        activity = QuotationActivity.getQuotationActivity();
 
         if(showDialog) {
             dialog = ProgressDialog.show(activity
