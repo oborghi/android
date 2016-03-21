@@ -1,16 +1,11 @@
 package com.leprechaun.quotationandweather.request;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.leprechaun.quotationandweather.R;
 import com.leprechaun.quotationandweather.WeatherActivity;
-import com.leprechaun.quotationandweather.entity.Quotation;
 import com.leprechaun.quotationandweather.json.HttpMethod;
 import com.leprechaun.quotationandweather.json.JSONParser;
-import com.leprechaun.quotationandweather.ui.AdapterQuotationList;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,52 +38,46 @@ public class DownloadLocationData extends AsyncTask<String, Void, String> {
         try {
 
             JSONObject locationJson = jsonRequest.makeHttpRequest(urlString, HttpMethod.GET, null);
-            JSONArray results = locationJson.getJSONArray("results");
 
-            if(results != null)
-            {
-                JSONObject addressJson = results.getJSONObject(0);
-                if(addressJson != null)
-                {
-                    JSONArray addressComponentsJson = addressJson.getJSONArray("address_components");
+            if(locationJson != null) {
+                JSONArray results = locationJson.getJSONArray("results");
+                if (results != null) {
+                    JSONObject addressJson = results.getJSONObject(0);
+                    if (addressJson != null) {
+                        JSONArray addressComponentsJson = addressJson.getJSONArray("address_components");
 
-                    for (int componentsCounter = 0; componentsCounter < addressComponentsJson.length(); componentsCounter++)
-                    {
-                        JSONObject addressComponentJson = addressComponentsJson.getJSONObject(componentsCounter);
+                        for (int componentsCounter = 0; componentsCounter < addressComponentsJson.length(); componentsCounter++) {
+                            JSONObject addressComponentJson = addressComponentsJson.getJSONObject(componentsCounter);
 
-                        if(addressComponentJson != null) {
-                            JSONArray addressComponentTypesJson = addressComponentJson.getJSONArray("types");
+                            if (addressComponentJson != null) {
+                                JSONArray addressComponentTypesJson = addressComponentJson.getJSONArray("types");
 
-                            List<String> types = new ArrayList<>();
+                                List<String> types = new ArrayList<>();
 
-                            for(int typesCounter = 0; typesCounter < addressComponentTypesJson.length(); typesCounter++) {
-                                types.add(addressComponentTypesJson.getString(typesCounter));
-                            }
+                                for (int typesCounter = 0; typesCounter < addressComponentTypesJson.length(); typesCounter++) {
+                                    types.add(addressComponentTypesJson.getString(typesCounter));
+                                }
 
-                            if(locality != null & state != null)
-                            {
-                                break;
-                            }
+                                if (locality != null & state != null) {
+                                    break;
+                                }
 
-                            if(types.contains("locality"))
-                            {
-                                locality = addressComponentJson.getString("long_name");
-                            }
+                                if (types.contains("locality")) {
+                                    locality = addressComponentJson.getString("long_name");
+                                }
 
-                            if(types.contains("administrative_area_level_1"))
-                            {
-                                state = addressComponentJson.getString("short_name");
+                                if (types.contains("administrative_area_level_1")) {
+                                    state = addressComponentJson.getString("short_name");
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            if(locality != null & state != null)
-            {
-                city = String.format("%1$s-%2$s", locality, state);
+                if (locality != null & state != null) {
+                    city = String.format("%1$s-%2$s", locality, state);
+                }
             }
-
         } catch (IOException e) {
             Log.e("JSON Request", "Error obtains data " + e.toString());
         } catch (JSONException e) {

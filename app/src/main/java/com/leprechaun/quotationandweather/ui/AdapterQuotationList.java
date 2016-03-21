@@ -1,7 +1,6 @@
 package com.leprechaun.quotationandweather.ui;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

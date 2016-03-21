@@ -30,12 +30,6 @@ public class QuotationActivity extends AppCompatActivity {
         backgroundGetQuotation();
     }
 
-    public void getQuotation(View view)
-    {
-        new DownloadQuotationData(this, true)
-                .execute(getResources().getString(R.string.quotation_url));
-    }
-
     public void showWeather(View view){
         Intent intentCall = new Intent(getApplicationContext(), WeatherActivity.class);
         startActivity(intentCall);

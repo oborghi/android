@@ -9,8 +9,8 @@ public class WeatherPrevision {
 
     private String date;
     private String description;
-    private int maxTempeature;
-    private int minTempeature;
+    private int maxTemperature;
+    private int minTemperature;
     private String imageUrl;
     private Bitmap image;
 
@@ -30,20 +30,20 @@ public class WeatherPrevision {
         this.description = description;
     }
 
-    public int getMaxTempeature() {
-        return maxTempeature;
+    public int getMaxTemperature() {
+        return maxTemperature;
     }
 
-    public void setMaxTempeature(int maxTempeature) {
-        this.maxTempeature = maxTempeature;
+    public void setMaxTemperature(int maxTemperature) {
+        this.maxTemperature = maxTemperature;
     }
 
-    public int getMinTempeature() {
-        return minTempeature;
+    public int getMinTemperature() {
+        return minTemperature;
     }
 
-    public void setMinTempeature(int minTempeature) {
-        this.minTempeature = minTempeature;
+    public void setMinTemperature(int minTemperature) {
+        this.minTemperature = minTemperature;
     }
 
     public String getImageUrl() {

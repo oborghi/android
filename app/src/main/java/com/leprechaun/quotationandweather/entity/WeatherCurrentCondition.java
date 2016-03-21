@@ -22,7 +22,7 @@ public class WeatherCurrentCondition {
     private String sunset;
     private String imageUrl;
     private Bitmap image;
-    private List<WeatherPrevision> previsions;
+
 
     public Date getDateAndTime() {
         return dateAndTime;
@@ -128,11 +128,5 @@ public class WeatherCurrentCondition {
         this.image = image;
     }
 
-    public List<WeatherPrevision> getPrevisions() {
-        return previsions;
-    }
 
-    public void setPrevisions(List<WeatherPrevision> previsions) {
-        this.previsions = previsions;
-    }
 }

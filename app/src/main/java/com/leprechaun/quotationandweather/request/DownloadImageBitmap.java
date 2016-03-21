@@ -1,13 +1,12 @@
 package com.leprechaun.quotationandweather.request;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.leprechaun.quotationandweather.R;
+import com.leprechaun.quotationandweather.WeatherActivity;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -17,35 +16,48 @@ import java.util.HashMap;
  */
 public class DownloadImageBitmap extends AsyncTask<String, Void, HashMap<String,Bitmap>> {
 
-    private Boolean loadError;
-    private Activity activity;
+    private WeatherActivity activity;
 
-    public DownloadImageBitmap(Activity activity){
+    public DownloadImageBitmap(WeatherActivity activity){
         this.activity = activity;
     }
 
     @Override
     protected HashMap<String,Bitmap> doInBackground(String... urls) {
         HashMap<String,Bitmap> imagesData = null;
-        try {
 
-            loadError = false;
+        if(urls != null && urls.length > 0) {
+            for (String urlDisplay : urls) {
 
-            for(String urlDisplay : urls)
-            {
                 Bitmap mIcon11;
-                InputStream in = new java.net.URL(urlDisplay).openStream();
+                Boolean containsImage = false;
 
-                mIcon11 = BitmapFactory.decodeStream(in);
+                try {
 
-                if(imagesData == null)
-                    imagesData = new HashMap<>();
+                    if(imagesData != null) {
+                        containsImage = imagesData.containsKey(urlDisplay);
+                    }
 
-                imagesData.put(urlDisplay, mIcon11);
+                    if(!containsImage) {
+                        InputStream in = new java.net.URL(urlDisplay).openStream();
+                        mIcon11 = BitmapFactory.decodeStream(in);
+
+                        if (imagesData == null)
+                            imagesData = new HashMap<>();
+
+                        imagesData.put(urlDisplay, mIcon11);
+                    }
+                } catch (Exception e) {
+                    Log.e("Image Download", "Error Downloading Image " + e.toString());
+
+                    mIcon11 = BitmapFactory.decodeResource(activity.getResources(), R.drawable.cannot_be_load);
+
+                    if (imagesData == null)
+                        imagesData = new HashMap<>();
+
+                    imagesData.put(urlDisplay, mIcon11);
+                }
             }
-        } catch (Exception e) {
-            Log.e("Error", e.getMessage());
-            loadError = true;
         }
 
         return imagesData;
@@ -53,18 +65,7 @@ public class DownloadImageBitmap extends AsyncTask<String, Void, HashMap<String,
 
     @Override
     protected void onPostExecute(HashMap<String,Bitmap> result) {
-        if(loadError)
-        {
-            AlertDialog.Builder builder = new AlertDialog.Builder(activity)
-                    .setTitle(R.string.dialog_attention)
-                    .setMessage(R.string.dialog_get_weather_info_error)
-                    .setPositiveButton("OK", null);
-
-            builder.create().show();
-        }
-        else
-        {
-
-        }
+        super.onPostExecute(result);
+        activity.setLastWeatherImagesUpdate(result);
     }
 }

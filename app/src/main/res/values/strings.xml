@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Cotação e Tempo</string>
     <string name="quotation_url">http://developers.agenciaideias.com.br/cotacoes/json</string>
-    <string name="weather_url">http://developers.agenciaideias.com.br/tempo/json/%s</string>
+    <string name="weather_url">http://developers.agenciaideias.com.br/tempo/json/</string>
     <string name="maps_url">http://maps.google.com/maps/api/geocode/json?latlng=%1$+.7f,%2$+.7f&amp;sensor=true</string>
     <string name="quotation_type">Indefinida</string>
     <string name="quotation_value">Valor:</string>
@@ -13,4 +13,5 @@
     <string name="dialog_get_quotation_error">Não foi possivel acessar as informções de cotação...</string>
     <string name="dialog_get_weather_info_error">Não foi possivel acessar as informções de tempo...</string>
     <string name="warning_message">*Os Valores são atualizados automáticamente a cada 5 minutos.</string>
+    <string name="button_weather">Clique na imagem para informações de Tempo.</string>
 </resources>

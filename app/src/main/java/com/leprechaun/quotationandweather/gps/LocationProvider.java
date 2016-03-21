@@ -1,14 +1,12 @@
 package com.leprechaun.quotationandweather.gps;
 
+import android.Manifest.permission;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.Manifest.permission;
 import android.os.Bundle;
-
-import com.leprechaun.quotationandweather.WeatherActivity;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -50,7 +48,10 @@ public class LocationProvider {
             lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListenerNetwork);
 
         timer1=new Timer();
-        timer1.schedule(new GetLastLocation(context), 20000);
+
+        //Update location in five minutes interval
+        timer1.schedule(new GetLastLocation(context),0, 5*60*1000);
+
         return true;
     }
 

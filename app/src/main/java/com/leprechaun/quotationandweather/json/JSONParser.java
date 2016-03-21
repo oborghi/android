@@ -27,13 +27,13 @@ import javax.net.ssl.HttpsURLConnection;
  */
 public class JSONParser {
 
-    static JSONObject jObj = null;
-    static String json = "";
-
-    // function get json from url
+       // function get json from url
     // by making HTTP POST or GET method
     public JSONObject makeHttpRequest(String url, HttpMethod method,
                                       HashMap<String, String> params) throws IOException {
+
+        JSONObject jObj = null;
+        String json = "";
 
         int responseCode;
         InputStream is = null;
@@ -41,8 +41,8 @@ public class JSONParser {
         // Making HTTP request
         try {
 
-            URL uri = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) uri.openConnection();
+            URL urlFormatted = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) urlFormatted.openConnection();
             connection.setRequestMethod(method.toString());
             connection.setReadTimeout(15000);
             connection.setConnectTimeout(15000);
@@ -61,6 +61,7 @@ public class JSONParser {
 
             if(responseCode == HttpsURLConnection.HTTP_OK)
                 is = connection.getInputStream();
+
 
         } catch (UnsupportedEncodingException | ProtocolException e) {
             e.printStackTrace();
