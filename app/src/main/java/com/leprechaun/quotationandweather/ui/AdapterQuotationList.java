@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Created by oborghi on 17/03/16.
+ * Created by oborghi on 17/03/16 - 19:12.
  */
 public class AdapterQuotationList extends ArrayAdapter<Quotation> {
 
@@ -52,8 +52,10 @@ public class AdapterQuotationList extends ArrayAdapter<Quotation> {
             if(textQuotationVariation != null) {
 
                 if(item.getVariation() >= 0) {
+                    //noinspection deprecation
                     textQuotationVariation.setTextColor(v.getResources().getColor(R.color.positive_variation));
                 } else {
+                    //noinspection deprecation
                     textQuotationVariation.setTextColor(v.getResources().getColor(R.color.negative_variation));
                 }
 

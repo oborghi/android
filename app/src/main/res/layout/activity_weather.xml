@@ -321,21 +321,6 @@
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:gravity="center|center_horizontal"
-        android:id="@+id/layoutLoadingData">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:id="@+id/labelLocationInfo"
-            android:text="@string/label_location_info" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
         android:gravity="bottom">
 
         <TextView

@@ -23,7 +23,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
- * Created by oborghi on 20/03/16.
+ * Created by oborghi on 20/03/16 - 19:13.
  */
 public class DownloadWeatherData extends AsyncTask<String, Void, Weather> {
 
@@ -121,9 +121,7 @@ public class DownloadWeatherData extends AsyncTask<String, Void, Weather> {
     protected void onPostExecute(Weather result)
     {
         super.onPostExecute(result);
-        if(result != null) {
-            activity.setLastWeatherUpdate(result);
-        }
+        activity.setLastWeatherUpdate(result);
     }
 
     private List<WeatherPrevision> getWeatherPrevisions(JSONObject objectJson)

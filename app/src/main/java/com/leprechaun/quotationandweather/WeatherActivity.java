@@ -1,10 +1,15 @@
 package com.leprechaun.quotationandweather;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
@@ -30,8 +35,7 @@ public class WeatherActivity extends AppCompatActivity {
     private Weather lastWeatherUpdate;
     private TextView textCity;
     private LinearLayout layoutWeatherInfo;
-    private LinearLayout layoutLoadingData;
-    private TextView labelTempeature;
+    private TextView labelTemperature;
     private TextView labelDescription;
     private TextView textHumidity;
     private TextView textPressure;
@@ -43,17 +47,37 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView textWindSpeed;
     private ImageView imageCurrentCondiction;
 
-    final Locale brasilLocale = new Locale("pt", "BR");
+    private ProgressDialog dialog;
+    private final Locale brasilLocale = new Locale("pt", "BR");
+    private static WeatherActivity currentActivity;
+    private static volatile AlertDialog errorDialog;
+
+    public static WeatherActivity getCurrentActivity() {
+        return currentActivity;
+    }
+
+    public static AlertDialog getErrorDialog() {
+        return errorDialog;
+    }
+
+    public static void setErrorDialog(AlertDialog errorDialog) {
+        WeatherActivity.errorDialog = errorDialog;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
 
+        currentActivity = this;
+
+        dialog = ProgressDialog.show(this
+                , this.getResources().getString(R.string.dialog_wait)
+                , this.getResources().getString(R.string.dialog_wait_message));
+
         textCity = (TextView) findViewById(R.id.labelCity);
         layoutWeatherInfo = (LinearLayout) findViewById(R.id.layoutWeatherInfo);
-        layoutLoadingData = (LinearLayout) findViewById(R.id.layoutLoadingData);
-        labelTempeature = (TextView) findViewById(R.id.labelTempeature);
+        labelTemperature = (TextView) findViewById(R.id.labelTempeature);
         labelDescription = (TextView) findViewById(R.id.labelDescription);
         textHumidity = (TextView) findViewById(R.id.textHumidity);
         textPressure = (TextView) findViewById(R.id.textPreassure);
@@ -64,6 +88,11 @@ public class WeatherActivity extends AppCompatActivity {
         textWindDirection = (TextView) findViewById(R.id.textWindDirection);
         textWindSpeed = (TextView) findViewById(R.id.textWindSpeed);
         imageCurrentCondiction = (ImageView) findViewById(R.id.imageCurrentCondiction);
+    }
+
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
 
         LocationResult locationResult = new LocationResult(){
             @Override
@@ -77,20 +106,37 @@ public class WeatherActivity extends AppCompatActivity {
     }
 
     public void showQuotation(View view){
-        Intent intentCall = new Intent(getApplicationContext(), QuotationActivity.class);
-        startActivity(intentCall);
+        Intent intentCall = new Intent(this, QuotationActivity.class);
+        this.startActivity(intentCall);
         finish();
     }
 
     private void updateCity(Location location) {
+        if(dialog == null)
+        {
+            dialog = ProgressDialog.show(this
+                    , this.getResources().getString(R.string.dialog_wait)
+                    , this.getResources().getString(R.string.dialog_wait_message));
+        }
+
         if (location != null) {
             String url = getResources().getString(R.string.maps_url, location.getLatitude(), location.getLongitude());
             new DownloadLocationData(this).execute(url);
+        }
+        else {
+            ShowDialog(R.string.dialog_get_weather_error);
         }
     }
 
     public void setCity(String city)
     {
+        if(dialog == null)
+        {
+            dialog = ProgressDialog.show(this
+                    , this.getResources().getString(R.string.dialog_wait)
+                    , this.getResources().getString(R.string.dialog_wait_message));
+        }
+
         if(city != null) {
             Uri builtUri = Uri.parse(getResources().getString(R.string.weather_url))
                     .buildUpon()
@@ -100,11 +146,11 @@ public class WeatherActivity extends AppCompatActivity {
             String url = builtUri.toString();
             new DownloadWeatherData(this).execute(url);
         }
+        else
+        {
+            ShowDialog(R.string.dialog_get_weather_error);
+        }
     }
-
-//    public Weather getLastWeatherUpdate() {
-//        return lastWeatherUpdate;
-//    }
 
     public void setLastWeatherUpdate(Weather lastWeatherUpdate) {
         if(lastWeatherUpdate != null) {
@@ -126,6 +172,35 @@ public class WeatherActivity extends AppCompatActivity {
             new DownloadImageBitmap(this).execute(imageUrlsArray);
 
             this.lastWeatherUpdate = lastWeatherUpdate;
+        }
+        else
+        {
+            ShowDialog(R.string.dialog_get_weather_info_error);
+        }
+    }
+
+    private void ShowDialog(final @StringRes int id) {
+        getCurrentActivity().runOnUiThread(new Runnable() {
+            public void run() {
+                if(getErrorDialog() == null) {
+
+                    setErrorDialog(new AlertDialog.Builder(getCurrentActivity())
+                            .setTitle(getCurrentActivity().getResources().getString(R.string.dialog_attention))
+                            .setMessage(getCurrentActivity().getResources().getString(id))
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    setErrorDialog(null);
+                                }
+                            }).create());
+                }
+            }
+        });
+
+        if(dialog != null) {
+            dialog.dismiss();
+            dialog = null;
+
+            getErrorDialog().show();
         }
     }
 
@@ -157,30 +232,33 @@ public class WeatherActivity extends AppCompatActivity {
                     this.lastWeatherUpdate.setPrevisions(weatherPrevisions);
                 }
             }
+        }
 
-            if(this.lastWeatherUpdate != null) {
+        if(this.lastWeatherUpdate != null) {
 
-                WeatherCurrentCondition currentCondition = this.lastWeatherUpdate.getCurrentCondition();
+            WeatherCurrentCondition currentCondition = this.lastWeatherUpdate.getCurrentCondition();
 
-                textCity.setText(this.lastWeatherUpdate.getCity());
-                labelTempeature.setText(String.format(brasilLocale, "%dºC", currentCondition.getTemperature()));
-                labelDescription.setText(currentCondition.getDescription());
-                textHumidity.setText(currentCondition.getHumidity());
-                textPressure.setText(currentCondition.getPressure());
-                textPressureStatus.setText(currentCondition.getPressureStatus());
-                textVisibility.setText(currentCondition.getVisibility());
-                textSunrise.setText(currentCondition.getSunrise());
-                textSunset.setText(currentCondition.getSunset());
-                textWindDirection.setText(currentCondition.getWindDirection());
-                textWindSpeed.setText(currentCondition.getWindSpeedy());
-                imageCurrentCondiction.setImageBitmap(currentCondition.getImage());
+            textCity.setText(this.lastWeatherUpdate.getCity());
+            labelTemperature.setText(String.format(brasilLocale, "%dºC", currentCondition.getTemperature()));
+            labelDescription.setText(currentCondition.getDescription());
+            textHumidity.setText(currentCondition.getHumidity());
+            textPressure.setText(currentCondition.getPressure());
+            textPressureStatus.setText(currentCondition.getPressureStatus());
+            textVisibility.setText(currentCondition.getVisibility());
+            textSunrise.setText(currentCondition.getSunrise());
+            textSunset.setText(currentCondition.getSunset());
+            textWindDirection.setText(currentCondition.getWindDirection());
+            textWindSpeed.setText(currentCondition.getWindSpeedy());
+            imageCurrentCondiction.setImageBitmap(currentCondition.getImage());
 
+            //TODO: Fill interface view with previsions.
 
-                //TODO: Fill interface view with previsions.
+            layoutWeatherInfo.setVisibility(View.VISIBLE);
+        }
 
-                layoutWeatherInfo.setVisibility(View.VISIBLE);
-                layoutLoadingData.setVisibility(View.INVISIBLE);
-            }
+        if(dialog != null) {
+            dialog.dismiss();
+            dialog = null;
         }
     }
 }

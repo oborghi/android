@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by oborghi on 20/03/16.
+ * Created by oborghi on 20/03/16 - 19:13.
  */
 public class DownloadLocationData extends AsyncTask<String, Void, String> {
 
@@ -91,8 +91,6 @@ public class DownloadLocationData extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String result)
     {
         super.onPostExecute(result);
-        if(result != null) {
-            activity.setCity(result);
-        }
+        activity.setCity(result);
     }
 }

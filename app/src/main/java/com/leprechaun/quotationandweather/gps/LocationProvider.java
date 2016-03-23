@@ -12,7 +12,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * Created by oborghi on 19/03/16.
+ * Created by oborghi on 19/03/16 - 19:12.
  */
 public class LocationProvider {
 
@@ -58,11 +58,11 @@ public class LocationProvider {
     LocationListener locationListenerGps = new LocationListener() {
         public void onLocationChanged(Location location) {
             timer1.cancel();
-            locationResult.gotLocation(location);
             if(gps_enabled && checkPermission(context, permission.ACCESS_FINE_LOCATION)) {
                 lm.removeUpdates(this);
                 lm.removeUpdates(locationListenerNetwork);
             }
+            locationResult.gotLocation(location);
         }
         public void onProviderDisabled(String provider) {}
         public void onProviderEnabled(String provider) {}
@@ -72,11 +72,11 @@ public class LocationProvider {
     LocationListener locationListenerNetwork = new LocationListener() {
         public void onLocationChanged(Location location) {
             timer1.cancel();
-            locationResult.gotLocation(location);
             if(network_enabled && checkPermission(context, permission.ACCESS_COARSE_LOCATION)) {
                 lm.removeUpdates(this);
                 lm.removeUpdates(locationListenerGps);
             }
+            locationResult.gotLocation(location);
         }
         public void onProviderDisabled(String provider) {}
         public void onProviderEnabled(String provider) {}
