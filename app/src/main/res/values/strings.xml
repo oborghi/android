@@ -14,4 +14,14 @@
     <string name="dialog_get_weather_info_error">Não foi possivel acessar as informções de tempo...</string>
     <string name="warning_message">*Os Valores são atualizados automáticamente a cada 5 minutos.</string>
     <string name="button_weather">Clique na imagem para informações de Tempo.</string>
+    <string name="button_quotation">Clique na imagem para informações de Cotação.</string>
+    <string name="label_pressure">Pressão:</string>
+    <string name="label_pressure_status">Pressão Status:</string>
+    <string name="label_humidity">Humidade:</string>
+    <string name="label_visibility">Visibilidade:</string>
+    <string name="label_sunrise">Nascer do Sol:</string>
+    <string name="label_wind_direction">Direção do Vento:</string>
+    <string name="label_sunset">Por do Sol:</string>
+    <string name="label_wind_speed">Velocidade do Vento:</string>
+    <string name="label_location_info">Localização ainda não identificada, Aguarde.. Assim que a sua localização for definida os dados da previsão serão visualizados.</string>
 </resources>

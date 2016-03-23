@@ -7,6 +7,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.leprechaun.quotationandweather.entity.Weather;
@@ -20,13 +22,28 @@ import com.leprechaun.quotationandweather.request.DownloadWeatherData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 public class WeatherActivity extends AppCompatActivity {
 
     private Weather lastWeatherUpdate;
     private TextView textCity;
+    private LinearLayout layoutWeatherInfo;
+    private LinearLayout layoutLoadingData;
+    private TextView labelTempeature;
+    private TextView labelDescription;
+    private TextView textHumidity;
+    private TextView textPressure;
+    private TextView textPressureStatus;
+    private TextView textVisibility;
+    private TextView textSunrise;
+    private TextView textSunset;
+    private TextView textWindDirection;
+    private TextView textWindSpeed;
+    private ImageView imageCurrentCondiction;
+
+    final Locale brasilLocale = new Locale("pt", "BR");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +51,19 @@ public class WeatherActivity extends AppCompatActivity {
         setContentView(R.layout.activity_weather);
 
         textCity = (TextView) findViewById(R.id.labelCity);
+        layoutWeatherInfo = (LinearLayout) findViewById(R.id.layoutWeatherInfo);
+        layoutLoadingData = (LinearLayout) findViewById(R.id.layoutLoadingData);
+        labelTempeature = (TextView) findViewById(R.id.labelTempeature);
+        labelDescription = (TextView) findViewById(R.id.labelDescription);
+        textHumidity = (TextView) findViewById(R.id.textHumidity);
+        textPressure = (TextView) findViewById(R.id.textPreassure);
+        textPressureStatus = (TextView) findViewById(R.id.textPreassureStatus);
+        textVisibility = (TextView) findViewById(R.id.textVisibility);
+        textSunrise = (TextView) findViewById(R.id.textSunrise);
+        textSunset = (TextView) findViewById(R.id.textSunset);
+        textWindDirection = (TextView) findViewById(R.id.textWindDirection);
+        textWindSpeed = (TextView) findViewById(R.id.textWindSpeed);
+        imageCurrentCondiction = (ImageView) findViewById(R.id.imageCurrentCondiction);
 
         LocationResult locationResult = new LocationResult(){
             @Override
@@ -72,9 +102,9 @@ public class WeatherActivity extends AppCompatActivity {
         }
     }
 
-    public Weather getLastWeatherUpdate() {
-        return lastWeatherUpdate;
-    }
+//    public Weather getLastWeatherUpdate() {
+//        return lastWeatherUpdate;
+//    }
 
     public void setLastWeatherUpdate(Weather lastWeatherUpdate) {
         if(lastWeatherUpdate != null) {
@@ -117,14 +147,9 @@ public class WeatherActivity extends AppCompatActivity {
                 List<WeatherPrevision> weatherPrevisions = this.lastWeatherUpdate.getPrevisions();
 
                 if(weatherPrevisions != null){
-                    Iterator<WeatherPrevision> weatherPrevisionsIterator = weatherPrevisions.iterator();
-                    while (weatherPrevisionsIterator.hasNext())
-                    {
-                        WeatherPrevision weatherPrevision = weatherPrevisionsIterator.next();
-
+                    for (WeatherPrevision weatherPrevision : weatherPrevisions) {
                         Bitmap previsionImage = images.get(weatherPrevision.getImageUrl());
-                        if(previsionImage != null)
-                        {
+                        if (previsionImage != null) {
                             weatherPrevision.setImage(previsionImage);
                         }
                     }
@@ -133,8 +158,29 @@ public class WeatherActivity extends AppCompatActivity {
                 }
             }
 
-            //TODO: Fill interface view here.
-            textCity.setText(this.lastWeatherUpdate.getCity());
+            if(this.lastWeatherUpdate != null) {
+
+                WeatherCurrentCondition currentCondition = this.lastWeatherUpdate.getCurrentCondition();
+
+                textCity.setText(this.lastWeatherUpdate.getCity());
+                labelTempeature.setText(String.format(brasilLocale, "%dºC", currentCondition.getTemperature()));
+                labelDescription.setText(currentCondition.getDescription());
+                textHumidity.setText(currentCondition.getHumidity());
+                textPressure.setText(currentCondition.getPressure());
+                textPressureStatus.setText(currentCondition.getPressureStatus());
+                textVisibility.setText(currentCondition.getVisibility());
+                textSunrise.setText(currentCondition.getSunrise());
+                textSunset.setText(currentCondition.getSunset());
+                textWindDirection.setText(currentCondition.getWindDirection());
+                textWindSpeed.setText(currentCondition.getWindSpeedy());
+                imageCurrentCondiction.setImageBitmap(currentCondition.getImage());
+
+
+                //TODO: Fill interface view with previsions.
+
+                layoutWeatherInfo.setVisibility(View.VISIBLE);
+                layoutLoadingData.setVisibility(View.INVISIBLE);
+            }
         }
     }
 }
