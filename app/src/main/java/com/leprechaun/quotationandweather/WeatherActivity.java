@@ -141,8 +141,6 @@ public class WeatherActivity extends AppCompatActivity {
         if(!provider.getLocation(locationResult)){
             ShowDialog(R.string.dialog_get_weather_error);
         }
-
-        getHandler().postDelayed(getRunnable(), 5000);
     }
 
     @Override
@@ -150,8 +148,6 @@ public class WeatherActivity extends AppCompatActivity {
         super.onPause();
         QuotationAndWeatherApp.activityWeatherPaused();
         provider.cancelBackgroundUpdates();
-        getHandler().removeCallbacks(getRunnable());
-        setErrorDialog(null);
     }
 
     @Override
@@ -165,8 +161,6 @@ public class WeatherActivity extends AppCompatActivity {
         super.onStop();
         QuotationAndWeatherApp.activityWeatherStop();
         provider.cancelBackgroundUpdates();
-        getHandler().removeCallbacks(getRunnable());
-        setErrorDialog(null);
     }
 
     public void showQuotation(View view){
@@ -248,6 +242,7 @@ public class WeatherActivity extends AppCompatActivity {
         getCurrentActivity().runOnUiThread(new Runnable() {
             public void run() {
                 if(getErrorDialog() == null) {
+
                     setErrorDialog(new AlertDialog.Builder(getCurrentActivity())
                             .setTitle(getCurrentActivity().getResources().getString(R.string.dialog_attention))
                             .setMessage(getCurrentActivity().getResources().getString(id))
@@ -267,6 +262,8 @@ public class WeatherActivity extends AppCompatActivity {
                     });
 
                     getErrorDialog().show();
+                    getHandler().postDelayed(getRunnable(), 5000);
+
                 }
             }
         });

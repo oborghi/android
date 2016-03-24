@@ -13,7 +13,7 @@
     <string name="dialog_get_quotation_error">Não foi possivel acessar as informções de cotação...</string>
     <string name="dialog_get_weather_error">Não foi possivel acessar as informações de localização do dispositivo...</string>
     <string name="dialog_get_weather_info_error">Não foi possivel acessar as informações de tempo...</string>
-    <string name="warning_message">*Os Valores são atualizados automáticamente a cada 5 minutos.</string>
+    <string name="warning_message">*Os Valores são atualizados automaticamente a cada 5 minutos.</string>
     <string name="button_weather">Clique na imagem para informações de Tempo.</string>
     <string name="button_quotation">Clique na imagem para informações de Cotação.</string>
     <string name="label_pressure">Pressão:</string>
