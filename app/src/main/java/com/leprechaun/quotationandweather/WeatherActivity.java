@@ -104,9 +104,11 @@ public class WeatherActivity extends AppCompatActivity {
                 updateCity(location);
             }
         };
-
         LocationProvider provider = new LocationProvider(this);
-        provider.getLocation(locationResult);
+
+        if(!provider.getLocation(locationResult)){
+            ShowDialog(R.string.dialog_get_weather_error);
+        }
     }
 
     public void showQuotation(View view){
