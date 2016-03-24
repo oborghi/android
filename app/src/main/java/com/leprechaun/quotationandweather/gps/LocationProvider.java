@@ -16,6 +16,10 @@ public class LocationProvider {
 
     LocationManager lm;
     LocationResult locationResult;
+    GetLastLocation getLastLocation;
+    Handler gpsHandler;
+    Handler networkHandler;
+
     boolean gps_enabled=false;
     boolean network_enabled=false;
     boolean gettingLocation=false;
@@ -40,10 +44,15 @@ public class LocationProvider {
         if(!gps_enabled && !network_enabled)
             return false;
 
+        getLastLocation = new GetLastLocation(context);
+        gpsHandler = new Handler();
+        networkHandler = new Handler();
+
         if(gps_enabled && checkPermission(context, permission.ACCESS_FINE_LOCATION))
             lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListenerGps);
         if(!gps_enabled && network_enabled && checkPermission(context, permission.ACCESS_COARSE_LOCATION))
             lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListenerNetwork);
+
 
         return true;
     }
@@ -58,9 +67,8 @@ public class LocationProvider {
                 }
                 locationResult.gotLocation(location);
 
-                Handler handler = new Handler();
                 //Update location in five minutes interval
-                handler.postDelayed(new GetLastLocation(context), 5 * 60 * 1000);
+                gpsHandler.postDelayed(getLastLocation, 5 * 60 * 1000);
 
                 gettingLocation = false;
             }
@@ -80,9 +88,8 @@ public class LocationProvider {
                 }
                 locationResult.gotLocation(location);
 
-                Handler handler = new Handler();
                 //Update location in five minutes interval
-                handler.postDelayed(new GetLastLocation(context), 5 * 60 * 1000);
+                networkHandler.postDelayed(getLastLocation, 5 * 60 * 1000);
 
                 gettingLocation = false;
             }
@@ -102,16 +109,19 @@ public class LocationProvider {
 
         @Override
         public void run() {
-
-            //exceptions will be thrown if provider is not permitted.
-            try{gps_enabled=lm.isProviderEnabled(LocationManager.GPS_PROVIDER);}catch(Exception ignored){}
-            try{network_enabled=lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);}catch(Exception ignored){}
-
-            if(gps_enabled && checkPermission(context, permission.ACCESS_FINE_LOCATION))
-                lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListenerGps);
-            if(!gps_enabled && network_enabled && checkPermission(context, permission.ACCESS_COARSE_LOCATION))
-                lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListenerNetwork);
+            updateData();
         }
+    }
+
+    public void updateData() {
+        //exceptions will be thrown if provider is not permitted.
+        try{gps_enabled=lm.isProviderEnabled(LocationManager.GPS_PROVIDER);}catch(Exception ignored){}
+        try{network_enabled=lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);}catch(Exception ignored){}
+
+        if(gps_enabled && checkPermission(context, permission.ACCESS_FINE_LOCATION))
+            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListenerGps);
+        if(!gps_enabled && network_enabled && checkPermission(context, permission.ACCESS_COARSE_LOCATION))
+            lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListenerNetwork);
     }
 
     private Boolean checkPermission(Context context,String permission)
@@ -121,5 +131,10 @@ public class LocationProvider {
                 permission,
                 context.getPackageName());
         return (hasPerm == PackageManager.PERMISSION_GRANTED);
+    }
+
+    public void cancelBackgroundUpdates() {
+        gpsHandler.removeCallbacks(getLastLocation);
+        networkHandler.removeCallbacks(getLastLocation);
     }
 }

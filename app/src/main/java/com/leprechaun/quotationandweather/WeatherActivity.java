@@ -8,7 +8,7 @@ import android.graphics.Bitmap;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.os.Handler;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -26,6 +26,7 @@ import com.leprechaun.quotationandweather.request.DownloadImageBitmap;
 import com.leprechaun.quotationandweather.request.DownloadLocationData;
 import com.leprechaun.quotationandweather.request.DownloadWeatherData;
 import com.leprechaun.quotationandweather.ui.AdapterPrevisionList;
+import com.leprechaun.quotationandweather.ui.QuotationAndWeatherApp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,6 +55,10 @@ public class WeatherActivity extends AppCompatActivity {
     private final Locale brasilLocale = new Locale("pt", "BR");
     private static WeatherActivity currentActivity;
     private static volatile AlertDialog errorDialog;
+    private static LocationProvider provider;
+    private static LocationResult locationResult;
+    private static Handler handler;
+    private static Runnable runnable;
 
     public static WeatherActivity getCurrentActivity() {
         return currentActivity;
@@ -67,16 +72,50 @@ public class WeatherActivity extends AppCompatActivity {
         WeatherActivity.errorDialog = errorDialog;
     }
 
+    public static Handler getHandler() {
+        return handler;
+    }
+
+    public static void setHandler(Handler handler) {
+        WeatherActivity.handler = handler;
+    }
+
+    public static Runnable getRunnable() {
+        return runnable;
+    }
+
+    public static void setRunnable(Runnable runnable) {
+        WeatherActivity.runnable = runnable;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
 
         currentActivity = this;
+        provider = new LocationProvider(this);
+        locationResult = new LocationResult(){
+            @Override
+            public void gotLocation(Location location){
+                if(QuotationAndWeatherApp.isActivityWeatherVisible())
+                    updateCity(location);
+            }
+        };
 
         dialog = ProgressDialog.show(this
                 , this.getResources().getString(R.string.dialog_wait)
                 , this.getResources().getString(R.string.dialog_wait_message));
+
+        setHandler(new Handler());
+        setRunnable(new Runnable() {
+            @Override
+            public void run() {
+                if (getErrorDialog() != null && getErrorDialog().isShowing()) {
+                    getErrorDialog().dismiss();
+                }
+            }
+        });
 
         textCity = (TextView) findViewById(R.id.labelCity);
         layoutWeatherInfo = (LinearLayout) findViewById(R.id.layoutWeatherInfo);
@@ -95,20 +134,39 @@ public class WeatherActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-
-        LocationResult locationResult = new LocationResult(){
-            @Override
-            public void gotLocation(Location location){
-                updateCity(location);
-            }
-        };
-        LocationProvider provider = new LocationProvider(this);
+    protected void onResume() {
+        super.onResume();
+        QuotationAndWeatherApp.activityWeatherResumed();
 
         if(!provider.getLocation(locationResult)){
             ShowDialog(R.string.dialog_get_weather_error);
         }
+
+        getHandler().postDelayed(getRunnable(), 5000);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        QuotationAndWeatherApp.activityWeatherPaused();
+        provider.cancelBackgroundUpdates();
+        getHandler().removeCallbacks(getRunnable());
+        setErrorDialog(null);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        QuotationAndWeatherApp.activityWeatherStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        QuotationAndWeatherApp.activityWeatherStop();
+        provider.cancelBackgroundUpdates();
+        getHandler().removeCallbacks(getRunnable());
+        setErrorDialog(null);
     }
 
     public void showQuotation(View view){
@@ -120,9 +178,9 @@ public class WeatherActivity extends AppCompatActivity {
     private void updateCity(Location location) {
         if(dialog == null)
         {
-            dialog = ProgressDialog.show(this
-                    , this.getResources().getString(R.string.dialog_wait)
-                    , this.getResources().getString(R.string.dialog_wait_message));
+                dialog = ProgressDialog.show(this
+                        , this.getResources().getString(R.string.dialog_wait)
+                        , this.getResources().getString(R.string.dialog_wait_message));
         }
 
         if (location != null) {
@@ -138,9 +196,9 @@ public class WeatherActivity extends AppCompatActivity {
     {
         if(dialog == null)
         {
-            dialog = ProgressDialog.show(this
-                    , this.getResources().getString(R.string.dialog_wait)
-                    , this.getResources().getString(R.string.dialog_wait_message));
+                dialog = ProgressDialog.show(this
+                        , this.getResources().getString(R.string.dialog_wait)
+                        , this.getResources().getString(R.string.dialog_wait_message));
         }
 
         if(city != null) {
@@ -186,6 +244,7 @@ public class WeatherActivity extends AppCompatActivity {
     }
 
     private void ShowDialog(final @StringRes int id) {
+
         getCurrentActivity().runOnUiThread(new Runnable() {
             public void run() {
                 if(getErrorDialog() == null) {
@@ -194,9 +253,18 @@ public class WeatherActivity extends AppCompatActivity {
                             .setMessage(getCurrentActivity().getResources().getString(id))
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                    setErrorDialog(null);
+                                    getErrorDialog().dismiss();
+
                                 }
                             }).create());
+
+                    getErrorDialog().setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            getHandler().removeCallbacks(getRunnable());
+                            setErrorDialog(null);
+                        }
+                    });
 
                     getErrorDialog().show();
                 }
