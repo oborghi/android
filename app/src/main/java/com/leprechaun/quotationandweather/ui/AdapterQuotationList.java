@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Created by oborghi on 17/03/16 - 19:12.
+ * Created by oborghi on 17/03/16 - 19:12 - 02:30.
  */
 public class AdapterQuotationList extends ArrayAdapter<Quotation> {
 
@@ -59,7 +59,7 @@ public class AdapterQuotationList extends ArrayAdapter<Quotation> {
                     textQuotationVariation.setTextColor(v.getResources().getColor(R.color.negative_variation));
                 }
 
-                textQuotationVariation.setText(String.format(brasilLocale, "%+,.2f", item.getVariation()));
+                textQuotationVariation.setText(String.format(brasilLocale, "%+,.2f%%", item.getVariation()));
             }
         }
 

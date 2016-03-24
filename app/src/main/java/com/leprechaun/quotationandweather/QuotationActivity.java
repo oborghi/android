@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.leprechaun.quotationandweather.entity.Quotation;
 import com.leprechaun.quotationandweather.request.DownloadQuotationData;
@@ -20,9 +21,18 @@ public class QuotationActivity extends AppCompatActivity {
 
     private ListView listQuotation;
     private static QuotationActivity currentActivity;
+    private TextView labelWarning;
 
-    private ProgressDialog dialog;
+    private static volatile ProgressDialog dialog;
     private AlertDialog errorDialog;
+
+    public static ProgressDialog getDialog() {
+        return dialog;
+    }
+
+    public static void setDialog(ProgressDialog dialog) {
+        QuotationActivity.dialog = dialog;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,11 +40,13 @@ public class QuotationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         listQuotation = (ListView) findViewById(R.id.listQuotation);
+        labelWarning = (TextView) findViewById(R.id.labelWarning);
+
         currentActivity = this;
 
-        dialog = ProgressDialog.show(this
+        setDialog(ProgressDialog.show(this
                 , this.getResources().getString(R.string.dialog_wait)
-                , this.getResources().getString(R.string.dialog_wait_message));
+                , this.getResources().getString(R.string.dialog_wait_message)));
 
         errorDialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.dialog_attention)
@@ -52,9 +64,9 @@ public class QuotationActivity extends AppCompatActivity {
 
     public void updateQuotationView(List<Quotation> result)
     {
-        if(dialog != null) {
-            dialog.dismiss();
-            dialog = null;
+        if(getDialog() != null) {
+            getDialog().dismiss();
+            setDialog(null);
         }
 
         if(result != null){
@@ -68,6 +80,8 @@ public class QuotationActivity extends AppCompatActivity {
         {
             errorDialog.show();
         }
+
+        labelWarning.setVisibility(View.VISIBLE);
     }
 
     public ListView getListQuotation() {
@@ -86,12 +100,18 @@ public class QuotationActivity extends AppCompatActivity {
         timer.schedule(new TimerTask() {
             public void run() {
 
-                if(dialog == null)
-                {
-                    dialog = ProgressDialog.show(QuotationActivity.getCurrentActivity()
-                            , QuotationActivity.getCurrentActivity().getResources().getString(R.string.dialog_wait)
-                            , QuotationActivity.getCurrentActivity().getResources().getString(R.string.dialog_wait_message));
-                }
+                getCurrentActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(getDialog() == null)
+                        {
+                            setDialog(ProgressDialog.show(QuotationActivity.getCurrentActivity()
+                                    , QuotationActivity.getCurrentActivity().getResources().getString(R.string.dialog_wait)
+                                    , QuotationActivity.getCurrentActivity().getResources().getString(R.string.dialog_wait_message)));
+                        }
+
+                    }
+                });
 
                 new DownloadQuotationData(QuotationActivity.getCurrentActivity())
                         .execute(getResources().getString(R.string.quotation_url));

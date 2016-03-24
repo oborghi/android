@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.leprechaun.quotationandweather.entity.Weather;
@@ -24,6 +25,7 @@ import com.leprechaun.quotationandweather.gps.LocationResult;
 import com.leprechaun.quotationandweather.request.DownloadImageBitmap;
 import com.leprechaun.quotationandweather.request.DownloadLocationData;
 import com.leprechaun.quotationandweather.request.DownloadWeatherData;
+import com.leprechaun.quotationandweather.ui.AdapterPrevisionList;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,6 +48,7 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView textWindDirection;
     private TextView textWindSpeed;
     private ImageView imageCurrentCondiction;
+    private ListView listPrevision;
 
     private ProgressDialog dialog;
     private final Locale brasilLocale = new Locale("pt", "BR");
@@ -88,6 +91,7 @@ public class WeatherActivity extends AppCompatActivity {
         textWindDirection = (TextView) findViewById(R.id.textWindDirection);
         textWindSpeed = (TextView) findViewById(R.id.textWindSpeed);
         imageCurrentCondiction = (ImageView) findViewById(R.id.imageCurrentCondiction);
+        listPrevision = (ListView) findViewById(R.id.listPrevision);
     }
 
     @Override
@@ -183,7 +187,6 @@ public class WeatherActivity extends AppCompatActivity {
         getCurrentActivity().runOnUiThread(new Runnable() {
             public void run() {
                 if(getErrorDialog() == null) {
-
                     setErrorDialog(new AlertDialog.Builder(getCurrentActivity())
                             .setTitle(getCurrentActivity().getResources().getString(R.string.dialog_attention))
                             .setMessage(getCurrentActivity().getResources().getString(id))
@@ -192,6 +195,8 @@ public class WeatherActivity extends AppCompatActivity {
                                     setErrorDialog(null);
                                 }
                             }).create());
+
+                    getErrorDialog().show();
                 }
             }
         });
@@ -199,8 +204,6 @@ public class WeatherActivity extends AppCompatActivity {
         if(dialog != null) {
             dialog.dismiss();
             dialog = null;
-
-            getErrorDialog().show();
         }
     }
 
@@ -251,7 +254,15 @@ public class WeatherActivity extends AppCompatActivity {
             textWindSpeed.setText(currentCondition.getWindSpeedy());
             imageCurrentCondiction.setImageBitmap(currentCondition.getImage());
 
-            //TODO: Fill interface view with previsions.
+            List<WeatherPrevision> previsions = this.lastWeatherUpdate.getPrevisions();
+
+            if(previsions != null){
+                if(previsions.size() > 0)
+                {
+                    AdapterPrevisionList adapter = new AdapterPrevisionList(this, R.layout.item_list_prevision, previsions);
+                    listPrevision.setAdapter(adapter);
+                }
+            }
 
             layoutWeatherInfo.setVisibility(View.VISIBLE);
         }

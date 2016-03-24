@@ -24,4 +24,7 @@
     <string name="label_wind_direction">Direção do Vento:</string>
     <string name="label_sunset">Por do Sol:</string>
     <string name="label_wind_speed">Velocidade do Vento:</string>
+    <string name="label_max_temperature">Máxima:</string>
+    <string name="label_min_temperature">Mínima:</string>
+    <string name="label_previsions">Previsões</string>
 </resources>

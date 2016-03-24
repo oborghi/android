@@ -14,8 +14,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:gravity="top"
-        android:layout_alignParentEnd="false"
-        android:layout_marginBottom="40dp">
+        android:layout_alignParentEnd="false">
 
         <LinearLayout
             android:orientation="horizontal"
@@ -45,29 +44,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/listQuotation"
-            android:headerDividersEnabled="false" />
-    </LinearLayout>
+            android:headerDividersEnabled="false"
+            android:layout_weight="1" />
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:gravity="bottom">
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="@string/warning_message"
-                android:id="@+id/labelWarning" />
-        </LinearLayout>
-
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/warning_message"
+            android:id="@+id/labelWarning"
+            android:visibility="invisible" />
     </LinearLayout>
 
 </RelativeLayout>
