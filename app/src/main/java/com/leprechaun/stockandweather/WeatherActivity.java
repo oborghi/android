@@ -117,15 +117,18 @@ public class WeatherActivity extends AppCompatActivity {
         locationResult = new LocationResult(){
             @Override
             public void gotLocation(Location location){
+                if(dialog == null)
+                {
+                    dialog = ProgressDialog.show(currentActivity
+                            , currentActivity.getResources().getString(R.string.dialog_wait)
+                            , currentActivity.getResources().getString(R.string.dialog_wait_message));
+                }
+
                 getTimeoutHandler().removeCallbacks(getTimeoutRunnable());
                 if(StockAndWeatherApp.isActivityWeatherVisible())
                     updateCity(location);
             }
         };
-
-        dialog = ProgressDialog.show(this
-                , this.getResources().getString(R.string.dialog_wait)
-                , this.getResources().getString(R.string.dialog_wait_message));
 
         setHandler(new Handler());
         setRunnable(new Runnable() {
@@ -166,10 +169,14 @@ public class WeatherActivity extends AppCompatActivity {
         super.onResume();
         StockAndWeatherApp.activityWeatherResumed();
 
+        dialog = ProgressDialog.show(this
+                , this.getResources().getString(R.string.dialog_wait)
+                , this.getResources().getString(R.string.dialog_wait_message));
+
         //Aguarda 30 segundos para receber uma resposta de localização
         //caso não receba resposta do provider encerra a busca.
 
-        getTimeoutHandler().postDelayed(getTimeoutRunnable(), 3500);
+        getTimeoutHandler().postDelayed(getTimeoutRunnable(), 35000);
         if(!provider.getLocation(locationResult)){
             ShowDialog(R.string.dialog_get_weather_error);
         }
@@ -210,7 +217,8 @@ public class WeatherActivity extends AppCompatActivity {
         }
 
         if (location != null) {
-            String url = getResources().getString(R.string.maps_url, location.getLatitude(), location.getLongitude());
+            String url = getResources().getString(R.string.maps_url);
+            url = String.format(Locale.ENGLISH, url, location.getLatitude(), location.getLongitude());
             new DownloadLocationData(this).execute(url);
         }
         else {

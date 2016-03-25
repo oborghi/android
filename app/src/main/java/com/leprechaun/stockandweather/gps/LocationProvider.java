@@ -50,7 +50,7 @@ public class LocationProvider {
 
         if(gps_enabled && checkPermission(context, permission.ACCESS_FINE_LOCATION))
             lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListenerGps);
-        if(!gps_enabled && network_enabled && checkPermission(context, permission.ACCESS_COARSE_LOCATION))
+        if(network_enabled && checkPermission(context, permission.ACCESS_COARSE_LOCATION))
             lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListenerNetwork);
 
         return true;
@@ -63,6 +63,7 @@ public class LocationProvider {
 
                 if (gps_enabled && checkPermission(context, permission.ACCESS_FINE_LOCATION)) {
                     lm.removeUpdates(this);
+                    lm.removeUpdates(locationListenerNetwork);
                 }
                 locationResult.gotLocation(location);
 
@@ -84,6 +85,7 @@ public class LocationProvider {
 
                 if (network_enabled && checkPermission(context, permission.ACCESS_COARSE_LOCATION)) {
                     lm.removeUpdates(this);
+                    lm.removeUpdates(locationListenerGps);
                 }
                 locationResult.gotLocation(location);
 
@@ -119,7 +121,7 @@ public class LocationProvider {
 
         if(gps_enabled && checkPermission(context, permission.ACCESS_FINE_LOCATION))
             lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListenerGps);
-        if(!gps_enabled && network_enabled && checkPermission(context, permission.ACCESS_COARSE_LOCATION))
+        if(network_enabled && checkPermission(context, permission.ACCESS_COARSE_LOCATION))
             lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListenerNetwork);
     }
 
@@ -135,5 +137,10 @@ public class LocationProvider {
     public void cancelBackgroundUpdates() {
         gpsHandler.removeCallbacks(getLastLocation);
         networkHandler.removeCallbacks(getLastLocation);
+
+        if(gps_enabled && checkPermission(context, permission.ACCESS_FINE_LOCATION))
+            lm.removeUpdates(locationListenerGps);
+        if(network_enabled && checkPermission(context, permission.ACCESS_COARSE_LOCATION))
+            lm.removeUpdates(locationListenerNetwork);
     }
 }
