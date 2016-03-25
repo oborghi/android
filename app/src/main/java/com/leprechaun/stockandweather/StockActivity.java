@@ -1,4 +1,4 @@
-package com.leprechaun.quotationandweather;
+package com.leprechaun.stockandweather;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -11,19 +11,20 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.leprechaun.quotationandweather.entity.Quotation;
-import com.leprechaun.quotationandweather.request.DownloadQuotationData;
-import com.leprechaun.quotationandweather.ui.AdapterQuotationList;
-import com.leprechaun.quotationandweather.ui.QuotationAndWeatherApp;
+import com.leprechaun.quotationandweather.R;
+import com.leprechaun.stockandweather.entity.Stock;
+import com.leprechaun.stockandweather.request.DownloadStockData;
+import com.leprechaun.stockandweather.ui.AdapterQuotationList;
+import com.leprechaun.stockandweather.ui.QuotationAndWeatherApp;
 
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class QuotationActivity extends AppCompatActivity {
+public class StockActivity extends AppCompatActivity {
 
     private ListView listQuotation;
-    private static QuotationActivity currentActivity;
+    private static StockActivity currentActivity;
     private TextView labelWarning;
     private Timer timer;
     private Handler handler;
@@ -37,14 +38,14 @@ public class QuotationActivity extends AppCompatActivity {
     }
 
     public static void setDialog(ProgressDialog dialog) {
-        QuotationActivity.dialog = dialog;
+        StockActivity.dialog = dialog;
     }
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_stock);
 
         listQuotation = (ListView) findViewById(R.id.listQuotation);
         labelWarning = (TextView) findViewById(R.id.labelWarning);
@@ -57,7 +58,7 @@ public class QuotationActivity extends AppCompatActivity {
 
         errorDialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.dialog_attention)
-                .setMessage(R.string.dialog_get_quotation_error)
+                .setMessage(R.string.dialog_get_stock_error)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         errorDialog.dismiss();
@@ -81,7 +82,6 @@ public class QuotationActivity extends AppCompatActivity {
             }
         });
 
-        timer = new Timer();
         handler.postDelayed(runnable, 5000);
     }
 
@@ -91,7 +91,7 @@ public class QuotationActivity extends AppCompatActivity {
         finish();
     }
 
-    public void updateQuotationView(List<Quotation> result)
+    public void updateQuotationView(List<Stock> result)
     {
         if(getDialog() != null) {
             getDialog().dismiss();
@@ -101,7 +101,7 @@ public class QuotationActivity extends AppCompatActivity {
         if(result != null){
             if(result.size() > 0)
             {
-                AdapterQuotationList adapter = new AdapterQuotationList(this, R.layout.item_list, result);
+                AdapterQuotationList adapter = new AdapterQuotationList(this, R.layout.item_list_instrument, result);
                 this.getListQuotation().setAdapter(adapter);
             }
         }
@@ -144,13 +144,18 @@ public class QuotationActivity extends AppCompatActivity {
         return listQuotation;
     }
 
-    public static QuotationActivity getCurrentActivity()
+    public static StockActivity getCurrentActivity()
     {
         return currentActivity;
     }
 
     private void backgroundGetQuotation() {
         //Atualiza cotação a cada 5 minutos.
+
+        if(timer != null)
+            timer.cancel();
+
+        timer = new Timer();
         timer.schedule(new TimerTask() {
             public void run() {
                 updateData();
@@ -164,15 +169,15 @@ public class QuotationActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     if (getDialog() == null) {
-                        setDialog(ProgressDialog.show(QuotationActivity.getCurrentActivity()
-                                , QuotationActivity.getCurrentActivity().getResources().getString(R.string.dialog_wait)
-                                , QuotationActivity.getCurrentActivity().getResources().getString(R.string.dialog_wait_message)));
+                        setDialog(ProgressDialog.show(StockActivity.getCurrentActivity()
+                                , StockActivity.getCurrentActivity().getResources().getString(R.string.dialog_wait)
+                                , StockActivity.getCurrentActivity().getResources().getString(R.string.dialog_wait_message)));
                     }
 
                 }
             });
 
-            new DownloadQuotationData(QuotationActivity.getCurrentActivity())
+            new DownloadStockData(StockActivity.getCurrentActivity())
                     .execute(getResources().getString(R.string.quotation_url));
         }
     }

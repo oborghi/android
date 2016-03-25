@@ -1,4 +1,4 @@
-package com.leprechaun.quotationandweather.gps;
+package com.leprechaun.stockandweather.gps;
 
 import android.Manifest.permission;
 import android.content.Context;
@@ -52,7 +52,6 @@ public class LocationProvider {
             lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListenerGps);
         if(!gps_enabled && network_enabled && checkPermission(context, permission.ACCESS_COARSE_LOCATION))
             lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListenerNetwork);
-
 
         return true;
     }

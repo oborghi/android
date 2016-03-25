@@ -1,4 +1,4 @@
-package com.leprechaun.quotationandweather.json;
+package com.leprechaun.stockandweather.json;
 
 /**
  * Created by oborghi on 16/03/16.

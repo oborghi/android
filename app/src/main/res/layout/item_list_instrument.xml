@@ -18,7 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="@string/quotation_type"
+            android:text="@string/stock_type"
             android:id="@+id/labelQuotationType"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="10dp" />
@@ -33,7 +33,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/quotation_value"
+                android:text="@string/stock_value"
                 android:id="@+id/labelQuotationValue" />
 
             <TextView
@@ -56,7 +56,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/quotation_variation"
+                android:text="@string/stock_variation"
                 android:id="@+id/labelQuotationVariation"/>
 
             <TextView

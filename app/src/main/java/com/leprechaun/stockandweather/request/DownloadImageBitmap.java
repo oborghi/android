@@ -1,4 +1,4 @@
-package com.leprechaun.quotationandweather.request;
+package com.leprechaun.stockandweather.request;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -6,7 +6,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.leprechaun.quotationandweather.R;
-import com.leprechaun.quotationandweather.WeatherActivity;
+import com.leprechaun.stockandweather.WeatherActivity;
 
 import java.io.InputStream;
 import java.util.HashMap;

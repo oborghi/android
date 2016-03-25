@@ -1,18 +1,18 @@
-package com.leprechaun.quotationandweather.entity;
+package com.leprechaun.stockandweather.entity;
 
 /**
  * Created by oborghi on 17/03/16.
  */
-public class Quotation {
-    private QuotationType type;
+public class Stock {
+    private StockType type;
     private double value;
     private double variation;
 
-    public QuotationType getType() {
+    public StockType getType() {
         return type;
     }
 
-    public void setType(QuotationType type) {
+    public void setType(StockType type) {
         this.type = type;
     }
 

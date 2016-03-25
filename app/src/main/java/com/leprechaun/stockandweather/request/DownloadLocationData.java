@@ -1,11 +1,11 @@
-package com.leprechaun.quotationandweather.request;
+package com.leprechaun.stockandweather.request;
 
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.leprechaun.quotationandweather.WeatherActivity;
-import com.leprechaun.quotationandweather.json.HttpMethod;
-import com.leprechaun.quotationandweather.json.JSONParser;
+import com.leprechaun.stockandweather.WeatherActivity;
+import com.leprechaun.stockandweather.json.HttpMethod;
+import com.leprechaun.stockandweather.json.JSONParser;
 
 import org.json.JSONArray;
 import org.json.JSONException;

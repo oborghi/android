@@ -1,4 +1,4 @@
-package com.leprechaun.quotationandweather;
+package com.leprechaun.stockandweather;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -17,16 +17,17 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.leprechaun.quotationandweather.entity.Weather;
-import com.leprechaun.quotationandweather.entity.WeatherCurrentCondition;
-import com.leprechaun.quotationandweather.entity.WeatherPrevision;
-import com.leprechaun.quotationandweather.gps.LocationProvider;
-import com.leprechaun.quotationandweather.gps.LocationResult;
-import com.leprechaun.quotationandweather.request.DownloadImageBitmap;
-import com.leprechaun.quotationandweather.request.DownloadLocationData;
-import com.leprechaun.quotationandweather.request.DownloadWeatherData;
-import com.leprechaun.quotationandweather.ui.AdapterPrevisionList;
-import com.leprechaun.quotationandweather.ui.QuotationAndWeatherApp;
+import com.leprechaun.quotationandweather.R;
+import com.leprechaun.stockandweather.entity.Weather;
+import com.leprechaun.stockandweather.entity.WeatherCurrentCondition;
+import com.leprechaun.stockandweather.entity.WeatherPrevision;
+import com.leprechaun.stockandweather.gps.LocationProvider;
+import com.leprechaun.stockandweather.gps.LocationResult;
+import com.leprechaun.stockandweather.request.DownloadImageBitmap;
+import com.leprechaun.stockandweather.request.DownloadLocationData;
+import com.leprechaun.stockandweather.request.DownloadWeatherData;
+import com.leprechaun.stockandweather.ui.AdapterPrevisionList;
+import com.leprechaun.stockandweather.ui.QuotationAndWeatherApp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,7 +59,9 @@ public class WeatherActivity extends AppCompatActivity {
     private static LocationProvider provider;
     private static LocationResult locationResult;
     private static Handler handler;
+    private static Handler timeoutHandler;
     private static Runnable runnable;
+    private static Runnable timeoutRunnable;
 
     public static WeatherActivity getCurrentActivity() {
         return currentActivity;
@@ -88,6 +91,22 @@ public class WeatherActivity extends AppCompatActivity {
         WeatherActivity.runnable = runnable;
     }
 
+    public static Handler getTimeoutHandler() {
+        return timeoutHandler;
+    }
+
+    public static void setTimeoutHandler(Handler timeoutHandler) {
+        WeatherActivity.timeoutHandler = timeoutHandler;
+    }
+
+    public static Runnable getTimeoutRunnable() {
+        return timeoutRunnable;
+    }
+
+    public static void setTimeoutRunnable(Runnable timeoutRunnable) {
+        WeatherActivity.timeoutRunnable = timeoutRunnable;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,6 +117,7 @@ public class WeatherActivity extends AppCompatActivity {
         locationResult = new LocationResult(){
             @Override
             public void gotLocation(Location location){
+                getTimeoutHandler().removeCallbacks(getTimeoutRunnable());
                 if(QuotationAndWeatherApp.isActivityWeatherVisible())
                     updateCity(location);
             }
@@ -114,6 +134,14 @@ public class WeatherActivity extends AppCompatActivity {
                 if (getErrorDialog() != null && getErrorDialog().isShowing()) {
                     getErrorDialog().dismiss();
                 }
+            }
+        });
+
+        setTimeoutHandler(new Handler());
+        setTimeoutRunnable(new Runnable() {
+            @Override
+            public void run() {
+                ShowDialog(R.string.dialog_get_weather_error);
             }
         });
 
@@ -138,6 +166,10 @@ public class WeatherActivity extends AppCompatActivity {
         super.onResume();
         QuotationAndWeatherApp.activityWeatherResumed();
 
+        //Aguarda 30 segundos para receber uma resposta de localização
+        //caso não receba resposta do provider encerra a busca.
+
+        getTimeoutHandler().postDelayed(getTimeoutRunnable(), 3500);
         if(!provider.getLocation(locationResult)){
             ShowDialog(R.string.dialog_get_weather_error);
         }
@@ -164,7 +196,7 @@ public class WeatherActivity extends AppCompatActivity {
     }
 
     public void showQuotation(View view){
-        Intent intentCall = new Intent(this, QuotationActivity.class);
+        Intent intentCall = new Intent(this, StockActivity.class);
         this.startActivity(intentCall);
         finish();
     }
@@ -249,7 +281,6 @@ public class WeatherActivity extends AppCompatActivity {
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     getErrorDialog().dismiss();
-
                                 }
                             }).create());
 
@@ -257,6 +288,7 @@ public class WeatherActivity extends AppCompatActivity {
                         @Override
                         public void onDismiss(DialogInterface dialog) {
                             getHandler().removeCallbacks(getRunnable());
+                            getTimeoutHandler().removeCallbacks(getTimeoutRunnable());
                             setErrorDialog(null);
                         }
                     });

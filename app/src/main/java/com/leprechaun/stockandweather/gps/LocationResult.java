@@ -1,4 +1,4 @@
-package com.leprechaun.quotationandweather.gps;
+package com.leprechaun.stockandweather.gps;
 
 import android.location.Location;
 

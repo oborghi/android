@@ -1,4 +1,4 @@
-package com.leprechaun.quotationandweather.ui;
+package com.leprechaun.stockandweather.ui;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.leprechaun.quotationandweather.R;
-import com.leprechaun.quotationandweather.entity.WeatherPrevision;
+import com.leprechaun.stockandweather.entity.WeatherPrevision;
 
 import java.util.List;
 import java.util.Locale;

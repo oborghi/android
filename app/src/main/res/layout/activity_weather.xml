@@ -7,7 +7,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.leprechaun.quotationandweather.WeatherActivity">
+    tools:context="com.leprechaun.stockandweather.WeatherActivity">
 
     <LinearLayout
         android:orientation="vertical"
@@ -116,29 +116,6 @@
                     <LinearLayout
                         android:orientation="horizontal"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" >
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:text="@string/label_wind_speed"
-                            android:id="@+id/labelWindDirection"
-                            android:textStyle="bold"
-                            android:layout_marginRight="5dp"
-                            android:layout_marginLeft="5dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:text="SES"
-                            android:id="@+id/textWindDirection" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
 
                         <TextView
@@ -148,15 +125,38 @@
                             android:text="@string/label_humidity"
                             android:id="@+id/labelHumidity"
                             android:textStyle="bold"
-                            android:layout_marginRight="5dp"
-                            android:layout_marginLeft="5dp" />
+                            android:layout_marginLeft="2dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="?android:attr/textAppearanceSmall"
                             android:id="@+id/textHumidity"
-                            android:text="73%" />
+                            android:text="73%"
+                            android:layout_marginLeft="2dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
+                            android:text="@string/label_wind_speed"
+                            android:id="@+id/labelWindSpeed"
+                            android:textStyle="bold"
+                            android:layout_marginLeft="2dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
+                            android:text="20,92 km\h"
+                            android:id="@+id/textWindSpeed"
+                            android:layout_marginLeft="2dp" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -178,15 +178,15 @@
                             android:text="@string/label_visibility"
                             android:id="@+id/labelVisibility"
                             android:textStyle="bold"
-                            android:layout_marginRight="5dp"
-                            android:layout_marginLeft="5dp" />
+                            android:layout_marginLeft="2dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="?android:attr/textAppearanceSmall"
                             android:id="@+id/textVisibility"
-                            android:text="9,99 km" />
+                            android:text="9,99 km"
+                            android:layout_marginLeft="2dp" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -201,15 +201,15 @@
                             android:text="@string/label_pressure_status"
                             android:id="@+id/labelPressureStatus"
                             android:textStyle="bold"
-                            android:layout_marginRight="5dp"
-                            android:layout_marginLeft="5dp" />
+                            android:layout_marginLeft="2dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="?android:attr/textAppearanceSmall"
                             android:text="descendo"
-                            android:id="@+id/textPreassureStatus" />
+                            android:id="@+id/textPreassureStatus"
+                            android:layout_marginLeft="2dp" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -231,15 +231,15 @@
                             android:text="@string/label_sunrise"
                             android:id="@+id/labelSunrise"
                             android:textStyle="bold"
-                            android:layout_marginRight="5dp"
-                            android:layout_marginLeft="5dp" />
+                            android:layout_marginLeft="2dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="?android:attr/textAppearanceSmall"
                             android:id="@+id/textSunrise"
-                            android:text="6:16 am" />
+                            android:text="6:16 am"
+                            android:layout_marginLeft="2dp" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -254,15 +254,15 @@
                             android:text="@string/label_pressure"
                             android:id="@+id/labelPreassure"
                             android:textStyle="bold"
-                            android:layout_marginRight="5dp"
-                            android:layout_marginLeft="5dp" />
+                            android:layout_marginLeft="2dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="?android:attr/textAppearanceSmall"
                             android:id="@+id/textPreassure"
-                            android:text="1.015,92 mBar" />
+                            android:text="1.015,92 mBar"
+                            android:layout_marginLeft="2dp" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -281,18 +281,18 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:text="@string/label_wind_direction"
-                            android:id="@+id/labelWindSpeed"
+                            android:text="@string/label_sunset"
+                            android:id="@+id/labelSunset"
                             android:textStyle="bold"
-                            android:layout_marginRight="5dp"
-                            android:layout_marginLeft="5dp" />
+                            android:layout_marginLeft="2dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:text="20,92 km\h"
-                            android:id="@+id/textWindSpeed" />
+                            android:id="@+id/textSunset"
+                            android:text="6:16 am"
+                            android:layout_marginLeft="2dp" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -304,19 +304,20 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:text="@string/label_sunset"
-                            android:id="@+id/labelSunset"
+                            android:text="@string/label_wind_direction"
+                            android:id="@+id/labelWindDirection"
                             android:textStyle="bold"
-                            android:layout_marginRight="5dp"
-                            android:layout_marginLeft="5dp" />
+                            android:layout_marginLeft="2dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:id="@+id/textSunset"
-                            android:text="6:16 am" />
+                            android:text="SES"
+                            android:id="@+id/textWindDirection"
+                            android:layout_marginLeft="2dp" />
                     </LinearLayout>
+
                 </LinearLayout>
 
             </LinearLayout>

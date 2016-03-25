@@ -1,9 +1,9 @@
-package com.leprechaun.quotationandweather.entity;
+package com.leprechaun.stockandweather.entity;
 
 /**
  * Created by oborghi on 17/03/16.
  */
-public enum QuotationValues {
+public enum StockValues {
     /**
      * Tipos de cotação
      */
@@ -12,7 +12,7 @@ public enum QuotationValues {
 
     private final String name;
 
-    QuotationValues(String s) {
+    StockValues(String s) {
         name = s;
     }
 

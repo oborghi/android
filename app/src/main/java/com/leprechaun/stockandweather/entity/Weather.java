@@ -1,4 +1,4 @@
-package com.leprechaun.quotationandweather.entity;
+package com.leprechaun.stockandweather.entity;
 
 import java.util.List;
 

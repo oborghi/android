@@ -1,4 +1,4 @@
-package com.leprechaun.quotationandweather.ui;
+package com.leprechaun.stockandweather.ui;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,7 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.leprechaun.quotationandweather.R;
-import com.leprechaun.quotationandweather.entity.Quotation;
+import com.leprechaun.stockandweather.entity.Stock;
 
 import java.util.List;
 import java.util.Locale;
@@ -16,11 +16,11 @@ import java.util.Locale;
 /**
  * Created by oborghi on 17/03/16 - 19:12 - 02:30.
  */
-public class AdapterQuotationList extends ArrayAdapter<Quotation> {
+public class AdapterQuotationList extends ArrayAdapter<Stock> {
 
     final Locale brasilLocale = new Locale("pt", "BR");
 
-    public AdapterQuotationList(Context context, int resource, List<Quotation> items) {
+    public AdapterQuotationList(Context context, int resource, List<Stock> items) {
         super(context, resource, items);
     }
 
@@ -32,10 +32,10 @@ public class AdapterQuotationList extends ArrayAdapter<Quotation> {
         if (v == null) {
             LayoutInflater vi;
             vi = LayoutInflater.from(getContext());
-            v = vi.inflate(R.layout.item_list, null);
+            v = vi.inflate(R.layout.item_list_instrument, null);
         }
 
-        Quotation item = getItem(position);
+        Stock item = getItem(position);
 
         if(item != null)
         {

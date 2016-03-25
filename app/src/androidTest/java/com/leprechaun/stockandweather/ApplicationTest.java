@@ -1,4 +1,4 @@
-package com.leprechaun.quotationandweather;
+package com.leprechaun.stockandweather;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
