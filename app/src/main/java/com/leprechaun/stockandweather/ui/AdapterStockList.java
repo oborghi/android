@@ -1,6 +1,7 @@
 package com.leprechaun.stockandweather.ui;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +17,14 @@ import java.util.Locale;
 /**
  * Created by oborghi on 17/03/16 - 19:12 - 02:30.
  */
-public class AdapterQuotationList extends ArrayAdapter<Stock> {
+public class AdapterStockList extends ArrayAdapter<Stock> {
 
     final Locale brasilLocale = new Locale("pt", "BR");
+    private Context context;
 
-    public AdapterQuotationList(Context context, int resource, List<Stock> items) {
+    public AdapterStockList(Context context, int resource, List<Stock> items) {
         super(context, resource, items);
+        this.context = context;
     }
 
     @Override
@@ -52,11 +55,21 @@ public class AdapterQuotationList extends ArrayAdapter<Stock> {
             if(textQuotationVariation != null) {
 
                 if(item.getVariation() >= 0) {
-                    //noinspection deprecation
-                    textQuotationVariation.setTextColor(v.getResources().getColor(R.color.positive_variation));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        textQuotationVariation.setTextColor(v.getResources().getColor(R.color.positive_variation, context.getTheme()));
+                    }
+                    else
+                    {
+                        textQuotationVariation.setTextColor(v.getResources().getColor(R.color.positive_variation));
+                    }
                 } else {
-                    //noinspection deprecation
-                    textQuotationVariation.setTextColor(v.getResources().getColor(R.color.negative_variation));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        textQuotationVariation.setTextColor(v.getResources().getColor(R.color.negative_variation, context.getTheme()));
+                    }
+                    else
+                    {
+                        textQuotationVariation.setTextColor(v.getResources().getColor(R.color.negative_variation));
+                    }
                 }
 
                 textQuotationVariation.setText(String.format(brasilLocale, "%+,.2f%%", item.getVariation()));

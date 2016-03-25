@@ -5,7 +5,7 @@ import android.app.Application;
 /**
  * Created by oborghi on 24/03/16 - 11:08.
  */
-public class QuotationAndWeatherApp extends Application {
+public class StockAndWeatherApp extends Application {
 
     private static boolean activityWeatherVisible;
     private static boolean activityQuotationVisible;

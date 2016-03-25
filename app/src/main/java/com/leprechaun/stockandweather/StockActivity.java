@@ -14,8 +14,8 @@ import android.widget.TextView;
 import com.leprechaun.quotationandweather.R;
 import com.leprechaun.stockandweather.entity.Stock;
 import com.leprechaun.stockandweather.request.DownloadStockData;
-import com.leprechaun.stockandweather.ui.AdapterQuotationList;
-import com.leprechaun.stockandweather.ui.QuotationAndWeatherApp;
+import com.leprechaun.stockandweather.ui.AdapterStockList;
+import com.leprechaun.stockandweather.ui.StockAndWeatherApp;
 
 import java.util.List;
 import java.util.Timer;
@@ -101,7 +101,7 @@ public class StockActivity extends AppCompatActivity {
         if(result != null){
             if(result.size() > 0)
             {
-                AdapterQuotationList adapter = new AdapterQuotationList(this, R.layout.item_list_instrument, result);
+                AdapterStockList adapter = new AdapterStockList(this, R.layout.item_list_instrument, result);
                 this.getListQuotation().setAdapter(adapter);
             }
         }
@@ -116,7 +116,7 @@ public class StockActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        QuotationAndWeatherApp.activityQuotationResumed();
+        StockAndWeatherApp.activityQuotationResumed();
         backgroundGetQuotation();
     }
 
@@ -124,20 +124,20 @@ public class StockActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         timer.cancel();
-        QuotationAndWeatherApp.activityQuotationPaused();
+        StockAndWeatherApp.activityQuotationPaused();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        QuotationAndWeatherApp.activityQuotationStart();
+        StockAndWeatherApp.activityQuotationStart();
     }
 
     @Override
     public void onStop() {
         super.onStop();
         timer.cancel();
-        QuotationAndWeatherApp.activityQuotationStop();
+        StockAndWeatherApp.activityQuotationStop();
     }
 
     public ListView getListQuotation() {
@@ -164,7 +164,7 @@ public class StockActivity extends AppCompatActivity {
     }
 
     private void updateData() {
-        if(QuotationAndWeatherApp.isActivityQuotationVisible()) {
+        if(StockAndWeatherApp.isActivityQuotationVisible()) {
             getCurrentActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {

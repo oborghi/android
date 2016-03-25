@@ -27,7 +27,7 @@ import com.leprechaun.stockandweather.request.DownloadImageBitmap;
 import com.leprechaun.stockandweather.request.DownloadLocationData;
 import com.leprechaun.stockandweather.request.DownloadWeatherData;
 import com.leprechaun.stockandweather.ui.AdapterPrevisionList;
-import com.leprechaun.stockandweather.ui.QuotationAndWeatherApp;
+import com.leprechaun.stockandweather.ui.StockAndWeatherApp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -118,7 +118,7 @@ public class WeatherActivity extends AppCompatActivity {
             @Override
             public void gotLocation(Location location){
                 getTimeoutHandler().removeCallbacks(getTimeoutRunnable());
-                if(QuotationAndWeatherApp.isActivityWeatherVisible())
+                if(StockAndWeatherApp.isActivityWeatherVisible())
                     updateCity(location);
             }
         };
@@ -164,7 +164,7 @@ public class WeatherActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        QuotationAndWeatherApp.activityWeatherResumed();
+        StockAndWeatherApp.activityWeatherResumed();
 
         //Aguarda 30 segundos para receber uma resposta de localização
         //caso não receba resposta do provider encerra a busca.
@@ -178,20 +178,20 @@ public class WeatherActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        QuotationAndWeatherApp.activityWeatherPaused();
+        StockAndWeatherApp.activityWeatherPaused();
         provider.cancelBackgroundUpdates();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        QuotationAndWeatherApp.activityWeatherStart();
+        StockAndWeatherApp.activityWeatherStart();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        QuotationAndWeatherApp.activityWeatherStop();
+        StockAndWeatherApp.activityWeatherStop();
         provider.cancelBackgroundUpdates();
     }
 
