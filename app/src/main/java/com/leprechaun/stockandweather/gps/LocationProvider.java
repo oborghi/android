@@ -7,70 +7,62 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by oborghi on 19/03/16 - 19:12.
  */
 public class LocationProvider {
 
+    Timer timer1;
     LocationManager lm;
     LocationResult locationResult;
-    GetLastLocation getLastLocation;
-    Handler gpsHandler;
-    Handler networkHandler;
-
-    boolean gps_enabled=false;
-    boolean network_enabled=false;
-    boolean gettingLocation=false;
+    boolean gps_enabled = false;
+    boolean network_enabled = false;
     Context context;
 
-    public LocationProvider(Context context){
-        this.context = context;
-    }
-
-    public boolean getLocation(LocationResult result)
-    {
+    public boolean getLocation(Context context, LocationResult result) {
         //I use LocationResult callback class to pass location value from MyLocation to user code.
-        locationResult=result;
-        if(lm==null)
+        locationResult = result;
+        this.context = context;
+
+        if (lm == null)
             lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
         //exceptions will be thrown if provider is not permitted.
-        try{gps_enabled=lm.isProviderEnabled(LocationManager.GPS_PROVIDER);}catch(Exception ignored){}
-        try{network_enabled=lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);}catch(Exception ignored){}
+        try {
+            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch (Exception ignored) { }
+
+        try {
+            network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        } catch (Exception ignored) { }
 
         //don't start listeners if no provider is enabled
-        if(!gps_enabled && !network_enabled)
+        if (!gps_enabled && !network_enabled)
             return false;
 
-        getLastLocation = new GetLastLocation(context);
-        gpsHandler = new Handler();
-        networkHandler = new Handler();
-
-        if(gps_enabled && checkPermission(context, permission.ACCESS_FINE_LOCATION))
+        if (gps_enabled && checkPermission())
             lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListenerGps);
-        if(network_enabled && checkPermission(context, permission.ACCESS_COARSE_LOCATION))
+        if(network_enabled && checkPermission())
             lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListenerNetwork);
+
+        timer1=new Timer();
+        timer1.schedule(new GetLastLocation(), 20000);
 
         return true;
     }
 
     LocationListener locationListenerGps = new LocationListener() {
         public void onLocationChanged(Location location) {
-            if(!gettingLocation) {
-                gettingLocation = true;
-
-                if (gps_enabled && checkPermission(context, permission.ACCESS_FINE_LOCATION)) {
-                    lm.removeUpdates(this);
-                    lm.removeUpdates(locationListenerNetwork);
-                }
-                locationResult.gotLocation(location);
-
-                //Update location in five minutes interval
-                gpsHandler.postDelayed(getLastLocation, 5 * 60 * 1000);
-
-                gettingLocation = false;
+            timer1.cancel();
+            locationResult.gotLocation(location);
+            if(checkPermission()) {
+                lm.removeUpdates(this);
+                lm.removeUpdates(locationListenerNetwork);
             }
         }
         public void onProviderDisabled(String provider) {}
@@ -80,19 +72,11 @@ public class LocationProvider {
 
     LocationListener locationListenerNetwork = new LocationListener() {
         public void onLocationChanged(Location location) {
-            if(!gettingLocation) {
-                gettingLocation = true;
-
-                if (network_enabled && checkPermission(context, permission.ACCESS_COARSE_LOCATION)) {
-                    lm.removeUpdates(this);
-                    lm.removeUpdates(locationListenerGps);
-                }
-                locationResult.gotLocation(location);
-
-                //Update location in five minutes interval
-                networkHandler.postDelayed(getLastLocation, 5 * 60 * 1000);
-
-                gettingLocation = false;
+            timer1.cancel();
+            locationResult.gotLocation(location);
+            if(checkPermission()) {
+                lm.removeUpdates(this);
+                lm.removeUpdates(locationListenerGps);
             }
         }
         public void onProviderDisabled(String provider) {}
@@ -100,47 +84,45 @@ public class LocationProvider {
         public void onStatusChanged(String provider, int status, Bundle extras) {}
     };
 
-    class GetLastLocation implements Runnable {
-
-        Context context;
-
-        public GetLastLocation(Context context) {
-            this.context = context;
-        }
-
+    class GetLastLocation extends TimerTask {
         @Override
         public void run() {
-            updateData();
+
+            if(checkPermission()) {
+                lm.removeUpdates(locationListenerGps);
+                lm.removeUpdates(locationListenerNetwork);
+            }
+
+            Location net_loc = null, gps_loc = null;
+            if (gps_enabled && checkPermission())
+                gps_loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (network_enabled && checkPermission())
+                net_loc = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+            //if there are both values use the latest one
+            if (gps_loc != null && net_loc != null) {
+                if (gps_loc.getTime() > net_loc.getTime())
+                    locationResult.gotLocation(gps_loc);
+                else
+                    locationResult.gotLocation(net_loc);
+                return;
+            }
+
+            if (gps_loc != null) {
+                locationResult.gotLocation(gps_loc);
+                return;
+            }
+            if (net_loc != null) {
+                locationResult.gotLocation(net_loc);
+                return;
+            }
+            locationResult.gotLocation(null);
         }
     }
 
-    public void updateData() {
-        //exceptions will be thrown if provider is not permitted.
-        try{gps_enabled=lm.isProviderEnabled(LocationManager.GPS_PROVIDER);}catch(Exception ignored){}
-        try{network_enabled=lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);}catch(Exception ignored){}
-
-        if(gps_enabled && checkPermission(context, permission.ACCESS_FINE_LOCATION))
-            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListenerGps);
-        if(network_enabled && checkPermission(context, permission.ACCESS_COARSE_LOCATION))
-            lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListenerNetwork);
-    }
-
-    private Boolean checkPermission(Context context,String permission)
+    private boolean checkPermission()
     {
-        PackageManager pm = context.getPackageManager();
-        int hasPerm = pm.checkPermission(
-                permission,
-                context.getPackageName());
-        return (hasPerm == PackageManager.PERMISSION_GRANTED);
-    }
-
-    public void cancelBackgroundUpdates() {
-        gpsHandler.removeCallbacks(getLastLocation);
-        networkHandler.removeCallbacks(getLastLocation);
-
-        if(gps_enabled && checkPermission(context, permission.ACCESS_FINE_LOCATION))
-            lm.removeUpdates(locationListenerGps);
-        if(network_enabled && checkPermission(context, permission.ACCESS_COARSE_LOCATION))
-            lm.removeUpdates(locationListenerNetwork);
+        return (ActivityCompat.checkSelfPermission(context, permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(context, permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED);
     }
 }

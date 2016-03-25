@@ -113,10 +113,11 @@ public class WeatherActivity extends AppCompatActivity {
         setContentView(R.layout.activity_weather);
 
         currentActivity = this;
-        provider = new LocationProvider(this);
+        provider = new LocationProvider();
         locationResult = new LocationResult(){
             @Override
             public void gotLocation(Location location){
+                getTimeoutHandler().removeCallbacks(getTimeoutRunnable());
                 if(dialog == null)
                 {
                     dialog = ProgressDialog.show(currentActivity
@@ -124,9 +125,7 @@ public class WeatherActivity extends AppCompatActivity {
                             , currentActivity.getResources().getString(R.string.dialog_wait_message));
                 }
 
-                getTimeoutHandler().removeCallbacks(getTimeoutRunnable());
-                if(StockAndWeatherApp.isActivityWeatherVisible())
-                    updateCity(location);
+                updateCity(location);
             }
         };
 
@@ -177,7 +176,7 @@ public class WeatherActivity extends AppCompatActivity {
         //caso não receba resposta do provider encerra a busca.
 
         getTimeoutHandler().postDelayed(getTimeoutRunnable(), 35000);
-        if(!provider.getLocation(locationResult)){
+        if(!provider.getLocation(this, locationResult)){
             ShowDialog(R.string.dialog_get_weather_error);
         }
     }
@@ -186,7 +185,6 @@ public class WeatherActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         StockAndWeatherApp.activityWeatherPaused();
-        provider.cancelBackgroundUpdates();
     }
 
     @Override
@@ -199,7 +197,6 @@ public class WeatherActivity extends AppCompatActivity {
     public void onStop() {
         super.onStop();
         StockAndWeatherApp.activityWeatherStop();
-        provider.cancelBackgroundUpdates();
     }
 
     public void showQuotation(View view){
@@ -303,7 +300,6 @@ public class WeatherActivity extends AppCompatActivity {
 
                     getErrorDialog().show();
                     getHandler().postDelayed(getRunnable(), 5000);
-
                 }
             }
         });
