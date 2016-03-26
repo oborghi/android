@@ -19,7 +19,7 @@ import java.util.Locale;
  */
 public class AdapterStockList extends ArrayAdapter<Stock> {
 
-    final Locale brasilLocale = new Locale("pt", "BR");
+    final Locale brazilLocale = new Locale("pt", "BR");
     private Context context;
 
     public AdapterStockList(Context context, int resource, List<Stock> items) {
@@ -50,7 +50,7 @@ public class AdapterStockList extends ArrayAdapter<Stock> {
                 labelQuotationType.setText(item.getType().capitalize());
 
             if(textQuotationValue != null)
-                textQuotationValue.setText(String.format(brasilLocale, "%1$,.2f", item.getValue()));
+                textQuotationValue.setText(String.format(brazilLocale, "%1$,.2f", item.getValue()));
 
             if(textQuotationVariation != null) {
 
@@ -72,7 +72,7 @@ public class AdapterStockList extends ArrayAdapter<Stock> {
                     }
                 }
 
-                textQuotationVariation.setText(String.format(brasilLocale, "%+,.2f%%", item.getVariation()));
+                textQuotationVariation.setText(String.format(brazilLocale, "%+,.2f%%", item.getVariation()));
             }
         }
 

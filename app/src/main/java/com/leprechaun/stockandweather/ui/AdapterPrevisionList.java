@@ -19,7 +19,7 @@ import java.util.Locale;
  */
 public class AdapterPrevisionList extends ArrayAdapter<WeatherPrevision> {
 
-    final Locale brasilLocale = new Locale("pt", "BR");
+    final Locale brazilLocale = new Locale("pt", "BR");
 
     public AdapterPrevisionList(Context context, int resource, List<WeatherPrevision> items) {
         super(context, resource, items);
@@ -53,11 +53,11 @@ public class AdapterPrevisionList extends ArrayAdapter<WeatherPrevision> {
                 labelDescription.setText(item.getDescription());
 
             if(textMaxTemperature != null) {
-                textMaxTemperature.setText(String.format(brasilLocale, "%dºC", item.getMaxTemperature()));
+                textMaxTemperature.setText(String.format(brazilLocale, "%dºC", item.getMaxTemperature()));
             }
 
             if(textMinTemperature != null) {
-                textMinTemperature.setText(String.format(brasilLocale, "%dºC", item.getMinTemperature()));
+                textMinTemperature.setText(String.format(brazilLocale, "%dºC", item.getMinTemperature()));
             }
 
             if(imagePrevision != null){

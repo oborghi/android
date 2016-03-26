@@ -1,15 +1,10 @@
 package com.leprechaun.stockandweather;
 
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
+import android.app.FragmentManager;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.annotation.StringRes;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
@@ -21,22 +16,20 @@ import com.leprechaun.quotationandweather.R;
 import com.leprechaun.stockandweather.entity.Weather;
 import com.leprechaun.stockandweather.entity.WeatherCurrentCondition;
 import com.leprechaun.stockandweather.entity.WeatherPrevision;
-import com.leprechaun.stockandweather.gps.LocationProvider;
-import com.leprechaun.stockandweather.gps.LocationResult;
-import com.leprechaun.stockandweather.request.DownloadImageBitmap;
 import com.leprechaun.stockandweather.request.DownloadLocationData;
-import com.leprechaun.stockandweather.request.DownloadWeatherData;
 import com.leprechaun.stockandweather.ui.AdapterPrevisionList;
-import com.leprechaun.stockandweather.ui.StockAndWeatherApp;
+import com.leprechaun.stockandweather.ui.IWeatherActivity;
+import com.leprechaun.stockandweather.ui.ProgressDialogFragment;
+//import com.leprechaun.stockandweather.ui.StockAndWeatherApp;
+import com.leprechaun.stockandweather.ui.TaskControl;
+import com.leprechaun.stockandweather.ui.TaskStatus;
+import com.leprechaun.stockandweather.ui.WeatherFragment;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-public class WeatherActivity extends AppCompatActivity {
+public class WeatherActivity extends AppCompatActivity implements IWeatherActivity {
 
-    private Weather lastWeatherUpdate;
     private TextView textCity;
     private LinearLayout layoutWeatherInfo;
     private TextView labelTemperature;
@@ -49,103 +42,24 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView textSunset;
     private TextView textWindDirection;
     private TextView textWindSpeed;
-    private ImageView imageCurrentCondiction;
+    private ImageView imageCurrentCondition;
     private ListView listPrevision;
 
-    private ProgressDialog dialog;
-    private final Locale brasilLocale = new Locale("pt", "BR");
-    private static WeatherActivity currentActivity;
-    private static volatile AlertDialog errorDialog;
-    private static LocationProvider provider;
-    private static LocationResult locationResult;
-    private static Handler handler;
-    private static Handler timeoutHandler;
-    private static Runnable runnable;
-    private static Runnable timeoutRunnable;
+    private WeatherFragment retainedFragment;
+    private static WeatherActivity instance;
 
-    public static WeatherActivity getCurrentActivity() {
-        return currentActivity;
-    }
+    private static final Locale brasilLocale = new Locale("pt", "BR");
+//    private AlertDialog errorDialog;
 
-    public static AlertDialog getErrorDialog() {
-        return errorDialog;
-    }
-
-    public static void setErrorDialog(AlertDialog errorDialog) {
-        WeatherActivity.errorDialog = errorDialog;
-    }
-
-    public static Handler getHandler() {
-        return handler;
-    }
-
-    public static void setHandler(Handler handler) {
-        WeatherActivity.handler = handler;
-    }
-
-    public static Runnable getRunnable() {
-        return runnable;
-    }
-
-    public static void setRunnable(Runnable runnable) {
-        WeatherActivity.runnable = runnable;
-    }
-
-    public static Handler getTimeoutHandler() {
-        return timeoutHandler;
-    }
-
-    public static void setTimeoutHandler(Handler timeoutHandler) {
-        WeatherActivity.timeoutHandler = timeoutHandler;
-    }
-
-    public static Runnable getTimeoutRunnable() {
-        return timeoutRunnable;
-    }
-
-    public static void setTimeoutRunnable(Runnable timeoutRunnable) {
-        WeatherActivity.timeoutRunnable = timeoutRunnable;
-    }
+    private final String retainedWeather = "retainedWeather";
+    private final String retainedProcessDialog = "retainedProcessDialog";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
 
-        currentActivity = this;
-        provider = new LocationProvider();
-        locationResult = new LocationResult(){
-            @Override
-            public void gotLocation(Location location){
-                getTimeoutHandler().removeCallbacks(getTimeoutRunnable());
-                if(dialog == null)
-                {
-                    dialog = ProgressDialog.show(currentActivity
-                            , currentActivity.getResources().getString(R.string.dialog_wait)
-                            , currentActivity.getResources().getString(R.string.dialog_wait_message));
-                }
-
-                updateCity(location);
-            }
-        };
-
-        setHandler(new Handler());
-        setRunnable(new Runnable() {
-            @Override
-            public void run() {
-                if (getErrorDialog() != null && getErrorDialog().isShowing()) {
-                    getErrorDialog().dismiss();
-                }
-            }
-        });
-
-        setTimeoutHandler(new Handler());
-        setTimeoutRunnable(new Runnable() {
-            @Override
-            public void run() {
-                ShowDialog(R.string.dialog_get_weather_error);
-            }
-        });
+        instance = this;
 
         textCity = (TextView) findViewById(R.id.labelCity);
         layoutWeatherInfo = (LinearLayout) findViewById(R.id.layoutWeatherInfo);
@@ -159,44 +73,46 @@ public class WeatherActivity extends AppCompatActivity {
         textSunset = (TextView) findViewById(R.id.textSunset);
         textWindDirection = (TextView) findViewById(R.id.textWindDirection);
         textWindSpeed = (TextView) findViewById(R.id.textWindSpeed);
-        imageCurrentCondiction = (ImageView) findViewById(R.id.imageCurrentCondiction);
+        imageCurrentCondition = (ImageView) findViewById(R.id.imageCurrentCondiction);
         listPrevision = (ListView) findViewById(R.id.listPrevision);
+
+        retainedFragment = getRetainedFragment();
+
+        if (retainedFragment == null) {
+            retainedFragment = createRetainedFragment();
+            setRetainedFragment(retainedFragment);
+        } else {
+            setLastWeatherUpdate(retainedFragment.getWeather());
+        }
+    }
+
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        StockAndWeatherApp.activityWeatherResumed();
-
-        dialog = ProgressDialog.show(this
-                , this.getResources().getString(R.string.dialog_wait)
-                , this.getResources().getString(R.string.dialog_wait_message));
-
-        //Aguarda 30 segundos para receber uma resposta de localização
-        //caso não receba resposta do provider encerra a busca.
-
-        getTimeoutHandler().postDelayed(getTimeoutRunnable(), 35000);
-        if(!provider.getLocation(this, locationResult)){
-            ShowDialog(R.string.dialog_get_weather_error);
-        }
+//        StockAndWeatherApp.activityWeatherResumed();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        StockAndWeatherApp.activityWeatherPaused();
+//        StockAndWeatherApp.activityWeatherPaused();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        StockAndWeatherApp.activityWeatherStart();
+//        StockAndWeatherApp.activityWeatherStart();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        StockAndWeatherApp.activityWeatherStop();
+//        StockAndWeatherApp.activityWeatherStop();
     }
 
     public void showQuotation(View view){
@@ -205,174 +121,158 @@ public class WeatherActivity extends AppCompatActivity {
         finish();
     }
 
-    private void updateCity(Location location) {
-        if(dialog == null)
-        {
-                dialog = ProgressDialog.show(this
-                        , this.getResources().getString(R.string.dialog_wait)
-                        , this.getResources().getString(R.string.dialog_wait_message));
-        }
+    //Interface Methods
 
-        if (location != null) {
-            String url = getResources().getString(R.string.maps_url);
-            url = String.format(Locale.ENGLISH, url, location.getLatitude(), location.getLongitude());
-            new DownloadLocationData(this).execute(url);
-        }
-        else {
-            ShowDialog(R.string.dialog_get_weather_error);
-        }
+    public WeatherFragment getRetainedFragment() {
+        return (WeatherFragment) getFragmentManager().findFragmentByTag(retainedWeather);
     }
 
-    public void setCity(String city)
+    @Override
+    public WeatherFragment getFragment() {
+        return retainedFragment;
+    }
+
+    public void setRetainedFragment(WeatherFragment fragment)
     {
-        if(dialog == null)
-        {
-                dialog = ProgressDialog.show(this
-                        , this.getResources().getString(R.string.dialog_wait)
-                        , this.getResources().getString(R.string.dialog_wait_message));
-        }
+        FragmentManager fm = getFragmentManager();
+        fm.beginTransaction().add(fragment, retainedWeather).commit();
+    }
 
-        if(city != null) {
-            Uri builtUri = Uri.parse(getResources().getString(R.string.weather_url))
-                    .buildUpon()
-                    .appendPath(city)
-                    .build();
+    @Override
+    public Context getContext() {
+        return this;
+    }
 
-            String url = builtUri.toString();
-            new DownloadWeatherData(this).execute(url);
-        }
-        else
+    @Override
+    public void onPreExecute() {
+        showProcessDialog();
+    }
+
+    @Override
+    public void onProgressUpdate(int percent) {
+
+    }
+
+    @Override
+    public void onCancelled() {
+
+    }
+
+    @Override
+    public void onPostExecute() {
+        WeatherFragment fragment = getRetainedFragment();
+        if (fragment != null)
         {
-            ShowDialog(R.string.dialog_get_weather_error);
+           setLastWeatherUpdate(fragment.getWeather());
         }
     }
 
-    public void setLastWeatherUpdate(Weather lastWeatherUpdate) {
+    private void setLastWeatherUpdate(Weather lastWeatherUpdate) {
+
         if(lastWeatherUpdate != null) {
 
-            List<String> imagesUrls = new ArrayList<>();
+            WeatherCurrentCondition currentCondition = lastWeatherUpdate.getCurrentCondition();
 
-            if(lastWeatherUpdate.getCurrentCondition() != null)
-                imagesUrls.add(lastWeatherUpdate.getCurrentCondition().getImageUrl());
+            instance.textCity.setText(lastWeatherUpdate.getCity());
+            instance.labelTemperature.setText(String.format(brasilLocale, "%dºC", currentCondition.getTemperature()));
+            instance.labelDescription.setText(currentCondition.getDescription());
+            instance.textHumidity.setText(currentCondition.getHumidity());
+            instance.textPressure.setText(currentCondition.getPressure());
+            instance.textPressureStatus.setText(currentCondition.getPressureStatus());
+            instance.textVisibility.setText(currentCondition.getVisibility());
+            instance.textSunrise.setText(currentCondition.getSunrise());
+            instance.textSunset.setText(currentCondition.getSunset());
+            instance.textWindDirection.setText(currentCondition.getWindDirection());
+            instance.textWindSpeed.setText(currentCondition.getWindSpeedy());
+            instance.imageCurrentCondition.setImageBitmap(currentCondition.getImage());
 
-            if(lastWeatherUpdate.getPrevisions() != null)
-                for(WeatherPrevision weatherPrevision : lastWeatherUpdate.getPrevisions())
-                {
-                    imagesUrls.add(weatherPrevision.getImageUrl());
-                }
-
-            String[] imageUrlsArray = new String[imagesUrls.size()];
-            imagesUrls.toArray(imageUrlsArray);
-
-            new DownloadImageBitmap(this).execute(imageUrlsArray);
-
-            this.lastWeatherUpdate = lastWeatherUpdate;
-        }
-        else
-        {
-            ShowDialog(R.string.dialog_get_weather_info_error);
-        }
-    }
-
-    private void ShowDialog(final @StringRes int id) {
-
-        getCurrentActivity().runOnUiThread(new Runnable() {
-            public void run() {
-                if(getErrorDialog() == null) {
-
-                    setErrorDialog(new AlertDialog.Builder(getCurrentActivity())
-                            .setTitle(getCurrentActivity().getResources().getString(R.string.dialog_attention))
-                            .setMessage(getCurrentActivity().getResources().getString(id))
-                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    getErrorDialog().dismiss();
-                                }
-                            }).create());
-
-                    getErrorDialog().setOnDismissListener(new DialogInterface.OnDismissListener() {
-                        @Override
-                        public void onDismiss(DialogInterface dialog) {
-                            getHandler().removeCallbacks(getRunnable());
-                            getTimeoutHandler().removeCallbacks(getTimeoutRunnable());
-                            setErrorDialog(null);
-                        }
-                    });
-
-                    getErrorDialog().show();
-                    getHandler().postDelayed(getRunnable(), 5000);
-                }
-            }
-        });
-
-        if(dialog != null) {
-            dialog.dismiss();
-            dialog = null;
-        }
-    }
-
-    public void setLastWeatherImagesUpdate(HashMap<String,Bitmap> images) {
-        if(images != null)
-        {
-            if(this.lastWeatherUpdate != null) {
-                WeatherCurrentCondition weatherCurrentCondition = this.lastWeatherUpdate.getCurrentCondition();
-
-                if (weatherCurrentCondition != null) {
-                    Bitmap currentConditionImage = images.get(weatherCurrentCondition.getImageUrl());
-
-                    if (currentConditionImage != null)
-                        weatherCurrentCondition.setImage(currentConditionImage);
-
-                    this.lastWeatherUpdate.setCurrentCondition(weatherCurrentCondition);
-                }
-
-                List<WeatherPrevision> weatherPrevisions = this.lastWeatherUpdate.getPrevisions();
-
-                if(weatherPrevisions != null){
-                    for (WeatherPrevision weatherPrevision : weatherPrevisions) {
-                        Bitmap previsionImage = images.get(weatherPrevision.getImageUrl());
-                        if (previsionImage != null) {
-                            weatherPrevision.setImage(previsionImage);
-                        }
-                    }
-
-                    this.lastWeatherUpdate.setPrevisions(weatherPrevisions);
-                }
-            }
-        }
-
-        if(this.lastWeatherUpdate != null) {
-
-            WeatherCurrentCondition currentCondition = this.lastWeatherUpdate.getCurrentCondition();
-
-            textCity.setText(this.lastWeatherUpdate.getCity());
-            labelTemperature.setText(String.format(brasilLocale, "%dºC", currentCondition.getTemperature()));
-            labelDescription.setText(currentCondition.getDescription());
-            textHumidity.setText(currentCondition.getHumidity());
-            textPressure.setText(currentCondition.getPressure());
-            textPressureStatus.setText(currentCondition.getPressureStatus());
-            textVisibility.setText(currentCondition.getVisibility());
-            textSunrise.setText(currentCondition.getSunrise());
-            textSunset.setText(currentCondition.getSunset());
-            textWindDirection.setText(currentCondition.getWindDirection());
-            textWindSpeed.setText(currentCondition.getWindSpeedy());
-            imageCurrentCondiction.setImageBitmap(currentCondition.getImage());
-
-            List<WeatherPrevision> previsions = this.lastWeatherUpdate.getPrevisions();
+            List<WeatherPrevision> previsions = lastWeatherUpdate.getPrevisions();
 
             if(previsions != null){
                 if(previsions.size() > 0)
                 {
                     AdapterPrevisionList adapter = new AdapterPrevisionList(this, R.layout.item_list_prevision, previsions);
-                    listPrevision.setAdapter(adapter);
+                    instance.listPrevision.setAdapter(adapter);
                 }
             }
 
-            layoutWeatherInfo.setVisibility(View.VISIBLE);
+            instance.layoutWeatherInfo.setVisibility(View.VISIBLE);
+
+            closeProcessDialog();
+        }
+//        else
+//        {
+//            ShowDialog(R.string.dialog_get_weather_info_error);
+//        }
+    }
+
+    private void showProcessDialog() {
+        FragmentManager fm = getFragmentManager();
+        ProgressDialogFragment dialogFragment = ProgressDialogFragment.newInstance();
+        dialogFragment.show(fm, retainedProcessDialog);
+    }
+
+    private ProgressDialogFragment getProcessDialog() {
+        return (ProgressDialogFragment) getFragmentManager().findFragmentByTag(retainedProcessDialog);
+    }
+
+    public void closeProcessDialog() {
+        ProgressDialogFragment dialogFragment = getProcessDialog();
+
+        if (dialogFragment != null) {
+            dialogFragment.dismiss();
+         }
+    }
+
+//    private void ShowDialog(final @StringRes int id) {
+//
+//        if (errorDialog == null) {
+//
+//            errorDialog = new AlertDialog.Builder(this)
+//                    .setTitle(getResources().getString(R.string.dialog_attention))
+//                    .setMessage(getResources().getString(id))
+//                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            errorDialog.dismiss();
+//                        }
+//                    }).create();
+//
+//            errorDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+//                @Override
+//                public void onDismiss(DialogInterface dialog) {
+//                    errorDialog = null;
+//                }
+//            });
+//
+//            errorDialog.show();
+//
+//            Handler dialogHandler = new Handler();
+//            Runnable dialogRunnable = new Runnable() {
+//                @Override
+//                public void run() {
+//                    errorDialog.dismiss();
+//                }
+//            };
+//
+//            dialogHandler.postDelayed(dialogRunnable, 5000);
+//        }
+//    }
+
+    private WeatherFragment createRetainedFragment() {
+
+        final IWeatherActivity mCallbacks = this;
+
+        class WeatherTaskControl extends TaskControl {
+
+            @Override
+            protected void executeTask() {
+                setStatus(TaskStatus.Called);
+                new DownloadLocationData(mCallbacks).execute();
+            }
         }
 
-        if(dialog != null) {
-            dialog.dismiss();
-            dialog = null;
-        }
+        retainedFragment = new WeatherFragment(new WeatherTaskControl());
+
+        return retainedFragment;
     }
 }

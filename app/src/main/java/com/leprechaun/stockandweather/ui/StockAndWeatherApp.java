@@ -7,28 +7,28 @@ import android.app.Application;
  */
 public class StockAndWeatherApp extends Application {
 
-    private static boolean activityWeatherVisible;
+//    private static boolean activityWeatherVisible;
     private static boolean activityQuotationVisible;
 
-    public static boolean isActivityWeatherVisible() {
-        return activityWeatherVisible;
-    }
+//    public static boolean isActivityWeatherVisible() {
+//        return activityWeatherVisible;
+//    }
 
-    public static void activityWeatherResumed() {
-        activityWeatherVisible = true;
-    }
-
-    public static void activityWeatherPaused() {
-        activityWeatherVisible = false;
-    }
-
-    public static void activityWeatherStart() {
-        activityWeatherVisible = true;
-    }
-
-    public static void activityWeatherStop() {
-        activityWeatherVisible = false;
-    }
+//    public static void activityWeatherResumed() {
+//        activityWeatherVisible = true;
+//    }
+//
+//    public static void activityWeatherPaused() {
+//        activityWeatherVisible = false;
+//    }
+//
+//    public static void activityWeatherStart() {
+//        activityWeatherVisible = true;
+//    }
+//
+//    public static void activityWeatherStop() {
+//        activityWeatherVisible = false;
+//    }
 
     public static boolean isActivityQuotationVisible() {
         return activityQuotationVisible;
