@@ -5,12 +5,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.leprechaun.quotationandweather.R;
 import com.leprechaun.stockandweather.entity.Weather;
@@ -46,7 +50,6 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherActivi
     private static WeatherActivity instance;
 
     private static final Locale brasilLocale = new Locale("pt", "BR");
-//    private AlertDialog errorDialog;
 
     private final String retained = "retainedWeather";
     private final String retainedProcess = "retainedWeatherProcess";
@@ -88,13 +91,31 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherActivi
         super.onPostCreate(savedInstanceState);
     }
 
-    public void showQuotation(View view){
-        Intent intentCall = new Intent(this, StockActivity.class);
-        this.startActivity(intentCall);
-        finish();
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.weather_menu, menu);
+        return true;
     }
 
-    //Interface Methods
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem)
+    {
+        switch (menuItem.getItemId())
+        {
+            case R.id.menu_item_stock:
+                startActivity(new Intent(this, StockActivity.class));
+                finish();
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public void setRetainedFragment(WeatherFragment fragment) {
+        FragmentManager fm = getFragmentManager();
+        fm.beginTransaction().add(fragment, retained).commit();
+    }
 
     public WeatherFragment getRetainedFragment() {
         return (WeatherFragment) getFragmentManager().findFragmentByTag(retained);
@@ -105,10 +126,11 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherActivi
         return retainedFragment;
     }
 
-    public void setRetainedFragment(WeatherFragment fragment)
+    @Override
+    public void showError()
     {
-        FragmentManager fm = getFragmentManager();
-        fm.beginTransaction().add(fragment, retained).commit();
+        closeProcessDialog();
+        showToast(R.string.dialog_get_weather_info_error);
     }
 
     @Override
@@ -134,15 +156,14 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherActivi
     @Override
     public void onPostExecute() {
         WeatherFragment fragment = getRetainedFragment();
-        if (fragment != null)
-        {
-           setLastWeatherUpdate(fragment.getWeather());
+        if (fragment != null) {
+            setLastWeatherUpdate(fragment.getWeather());
         }
     }
 
     private void setLastWeatherUpdate(Weather lastWeatherUpdate) {
 
-        if(lastWeatherUpdate != null) {
+        if (lastWeatherUpdate != null) {
 
             WeatherCurrentCondition currentCondition = lastWeatherUpdate.getCurrentCondition();
 
@@ -161,9 +182,8 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherActivi
 
             List<WeatherPrevision> previsions = lastWeatherUpdate.getPrevisions();
 
-            if(previsions != null){
-                if(previsions.size() > 0)
-                {
+            if (previsions != null) {
+                if (previsions.size() > 0) {
                     AdapterPrevisionList adapter = new AdapterPrevisionList(this, R.layout.item_list_prevision, previsions);
                     instance.listPrevision.setAdapter(adapter);
                 }
@@ -173,13 +193,16 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherActivi
 
             closeProcessDialog();
         }
+    }
 
-        //TODO: add error dialog fragment
+    public void showToast(final @StringRes int id)
+    {
+        Context context = getApplicationContext();
+        CharSequence text = getString(id);
+        int duration = Toast.LENGTH_LONG;
 
-//        else
-//        {
-//            ShowDialog(R.string.dialog_get_weather_info_error);
-//        }
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
     }
 
     private void showProcessDialog() {
@@ -197,42 +220,8 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherActivi
 
         if (dialogFragment != null) {
             dialogFragment.dismiss();
-         }
+        }
     }
-
-//    private void ShowDialog(final @StringRes int id) {
-//
-//        if (errorDialog == null) {
-//
-//            errorDialog = new AlertDialog.Builder(this)
-//                    .setTitle(getResources().getString(R.string.dialog_attention))
-//                    .setMessage(getResources().getString(id))
-//                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                        public void onClick(DialogInterface dialog, int which) {
-//                            errorDialog.dismiss();
-//                        }
-//                    }).create();
-//
-//            errorDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-//                @Override
-//                public void onDismiss(DialogInterface dialog) {
-//                    errorDialog = null;
-//                }
-//            });
-//
-//            errorDialog.show();
-//
-//            Handler dialogHandler = new Handler();
-//            Runnable dialogRunnable = new Runnable() {
-//                @Override
-//                public void run() {
-//                    errorDialog.dismiss();
-//                }
-//            };
-//
-//            dialogHandler.postDelayed(dialogRunnable, 5000);
-//        }
-//    }
 
     private WeatherFragment createRetainedFragment() {
 

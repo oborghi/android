@@ -55,6 +55,10 @@ public class DownloadStockData extends AsyncTask<Void, Integer, List<Stock>> {
     {
         super.onPostExecute(result);
         fragment.setStockList(result);
+
+        if(result == null)
+            mCallbacks.showError();
+
         mCallbacks.onPostExecute();
     }
 

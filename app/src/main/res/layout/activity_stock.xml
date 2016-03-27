@@ -16,30 +16,6 @@
         android:gravity="top"
         android:layout_alignParentEnd="false">
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical">
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/buttonWeather"
-                android:background="@drawable/weather_button"
-                android:clickable="true"
-                android:onClick="showWeather"
-                android:layout_margin="5dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="@string/button_weather"
-                android:id="@+id/labelWeather"
-                android:layout_marginLeft="10dp" />
-        </LinearLayout>
-
         <ListView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -47,13 +23,6 @@
             android:headerDividersEnabled="false"
             android:layout_weight="1" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="@string/warning_message"
-            android:id="@+id/labelWarning"
-            android:visibility="invisible" />
     </LinearLayout>
 
 </RelativeLayout>

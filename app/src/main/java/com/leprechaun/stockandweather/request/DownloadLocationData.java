@@ -146,7 +146,7 @@ public class DownloadLocationData extends AsyncTask<Void, Integer, Weather> {
                     @Override
                     public void run() {
                         // Do Work
-                        if(!locationServiceDisabled && !locationGot && maxTries[0] < 90)
+                        if(!locationServiceDisabled && !locationGot && maxTries[0] < 120)
                         {
                             maxTries[0]++;
                             handler.postDelayed(this, 1000);
@@ -455,37 +455,14 @@ public class DownloadLocationData extends AsyncTask<Void, Integer, Weather> {
         return previsions;
     }
 
-    @NonNull
-    private Date getWeatherDate(String dateAndTime) {
-
-        String[] dateAndTimeArray = dateAndTime.split("-");
-
-        String[] dateArray = dateAndTimeArray[0].trim().split("/");
-        String[] timeArray = dateAndTimeArray[1].trim().split(":");
-
-        String day = dateArray[0];
-        String month = dateArray[1];
-        String year = dateArray[2];
-
-        String hour = timeArray[0];
-        String minute = timeArray[1];
-
-        Calendar calendar = new GregorianCalendar();
-
-        calendar.add(Calendar.DAY_OF_MONTH, Integer.parseInt(day));
-        calendar.add(Calendar.MONTH, Integer.parseInt(month));
-        calendar.add(Calendar.YEAR, Integer.parseInt(year));
-        calendar.add(Calendar.HOUR, Integer.parseInt(hour));
-        calendar.add(Calendar.MINUTE, Integer.parseInt(minute));
-
-        return calendar.getTime();
-    }
-
     @Override
     protected void onPostExecute(Weather result)
     {
         super.onPostExecute(result);
         fragment.setWeather(result);
+
+        if(result == null)
+            mCallbacks.showError();
 
         mCallbacks.onPostExecute();
     }

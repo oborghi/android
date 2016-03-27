@@ -7,6 +7,19 @@ public abstract class RunnableFragment extends Fragment {
     private Runnable action;
     private Thread thread;
 
+    protected RunnableFragment()
+    {
+        super();
+    }
+
+    protected RunnableFragment(Runnable action) {
+        super();
+        this.action = action;
+
+        if(action != null)
+            this.thread = new Thread(action);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -17,11 +30,15 @@ public abstract class RunnableFragment extends Fragment {
         }
     }
 
-    protected RunnableFragment(Runnable action) {
-        super();
-        this.action = action;
+    @Override
+    public void onDestroy() {
+        if (this.thread != null) {
+            if (thread.isAlive()) {
+                thread.interrupt();
+                thread = null;
+            }
+        }
 
-        if(action != null)
-            this.thread = new Thread(action);
+        super.onDestroy();
     }
 }

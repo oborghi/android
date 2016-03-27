@@ -12,7 +12,7 @@ public class StockFragment extends RunnableFragment {
 
     public StockFragment()
     {
-        super(null);
+        super();
     }
 
     @SuppressLint("ValidFragment")

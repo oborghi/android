@@ -7,4 +7,5 @@ public interface IWeatherActivity extends IBackgroundProcessActivity {
     WeatherFragment getFragment();
     Context getContext();
     Resources getResources();
+    void showError();
 }

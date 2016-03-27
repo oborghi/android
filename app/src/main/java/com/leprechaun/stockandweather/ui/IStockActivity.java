@@ -5,4 +5,5 @@ import android.content.res.Resources;
 public interface IStockActivity extends IBackgroundProcessActivity {
     StockFragment getFragment();
     Resources getResources();
+    void showError();
 }

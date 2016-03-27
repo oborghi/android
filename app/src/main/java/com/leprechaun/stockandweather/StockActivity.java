@@ -1,12 +1,15 @@
 package com.leprechaun.stockandweather;
 
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.leprechaun.quotationandweather.R;
 import com.leprechaun.stockandweather.entity.Stock;
@@ -20,16 +23,12 @@ import java.util.List;
 
 public class StockActivity extends AppCompatActivity implements IStockActivity {
 
-    private ListView listQuotation;
-    private TextView labelWarning;
-
-    //private AlertDialog errorDialog;
-
-    private StockFragment retainedFragment;
     private static StockActivity instance;
-
     private final String retained = "retainedStock";
+
     private final String retainedProcess = "retainedStockProcess";
+    private ListView listQuotation;
+    private StockFragment retainedFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +38,6 @@ public class StockActivity extends AppCompatActivity implements IStockActivity {
         instance = this;
 
         listQuotation = (ListView) findViewById(R.id.listQuotation);
-        labelWarning = (TextView) findViewById(R.id.labelWarning);
 
         retainedFragment = getRetainedFragment();
 
@@ -51,36 +49,47 @@ public class StockActivity extends AppCompatActivity implements IStockActivity {
         }
     }
 
-    public void showWeather(View view){
-        Intent intentCall = new Intent(this, WeatherActivity.class);
-        this.startActivity(intentCall);
-        finish();
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.stock_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem)
+    {
+        switch (menuItem.getItemId())
+        {
+            case R.id.menu_item_weather :
+                startActivity(new Intent(this, WeatherActivity.class));
+                finish();
+                return true;
+            default:
+                return false;
+        }
     }
 
     public void updateQuotationView(List<Stock> result)
     {
-
         if(result != null){
             if(result.size() > 0)
             {
                 AdapterStockList adapter = new AdapterStockList(this, R.layout.item_list_instrument, result);
                 instance.listQuotation.setAdapter(adapter);
             }
-
             closeProcessDialog();
         }
-
-        //TODO: add error dialog fragment
-//        else
-//        {
-//            errorDialog.show();
-//        }
-
-        labelWarning.setVisibility(View.VISIBLE);
     }
 
     public StockFragment getRetainedFragment() {
         return (StockFragment) getFragmentManager().findFragmentByTag(retained);
+    }
+
+    public void setRetainedFragment(StockFragment fragment)
+    {
+        FragmentManager fm = getFragmentManager();
+        fm.beginTransaction().add(fragment, retained).commit();
     }
 
     @Override
@@ -88,10 +97,11 @@ public class StockActivity extends AppCompatActivity implements IStockActivity {
         return retainedFragment;
     }
 
-    public void setRetainedFragment(StockFragment fragment)
+    @Override
+    public void showError()
     {
-        FragmentManager fm = getFragmentManager();
-        fm.beginTransaction().add(fragment, retained).commit();
+        closeProcessDialog();
+        showToast(R.string.dialog_get_stock_error);
     }
 
     @Override
@@ -116,6 +126,16 @@ public class StockActivity extends AppCompatActivity implements IStockActivity {
         {
             updateQuotationView(fragment.getStockList());
         }
+    }
+
+    public void showToast(final @StringRes int id)
+    {
+        Context context = getApplicationContext();
+        CharSequence text = getString(id);
+        int duration = Toast.LENGTH_LONG;
+
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
     }
 
     private void showProcessDialog() {
