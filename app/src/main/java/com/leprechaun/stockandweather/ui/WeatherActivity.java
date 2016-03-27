@@ -1,4 +1,4 @@
-package com.leprechaun.stockandweather;
+package com.leprechaun.stockandweather.ui;
 
 import android.app.FragmentManager;
 import android.content.Context;
@@ -20,11 +20,11 @@ import com.leprechaun.quotationandweather.R;
 import com.leprechaun.stockandweather.entity.Weather;
 import com.leprechaun.stockandweather.entity.WeatherCurrentCondition;
 import com.leprechaun.stockandweather.entity.WeatherPrevision;
-import com.leprechaun.stockandweather.request.DownloadLocationData;
-import com.leprechaun.stockandweather.ui.AdapterPrevisionList;
-import com.leprechaun.stockandweather.ui.IWeatherActivity;
-import com.leprechaun.stockandweather.ui.ProgressDialogFragment;
-import com.leprechaun.stockandweather.ui.WeatherFragment;
+import com.leprechaun.stockandweather.ui.adapters.AdapterPrevisionList;
+import com.leprechaun.stockandweather.ui.interfaces.IWeatherActivity;
+import com.leprechaun.stockandweather.ui.fragment.ProgressDialogFragment;
+import com.leprechaun.stockandweather.request.thread.RunnableWeatherData;
+import com.leprechaun.stockandweather.ui.fragment.WeatherFragment;
 
 import java.util.List;
 import java.util.Locale;
@@ -224,18 +224,7 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherActivi
     }
 
     private WeatherFragment createRetainedFragment() {
-
-        final IWeatherActivity mCallbacks = this;
-
-        Runnable asyncRun = new Runnable() {
-            @Override
-            public void run() {
-                new DownloadLocationData(mCallbacks).execute();
-            }
-        };
-
-        retainedFragment = new WeatherFragment(asyncRun);
-
+        retainedFragment = new WeatherFragment(new RunnableWeatherData(this));
         return retainedFragment;
     }
 }

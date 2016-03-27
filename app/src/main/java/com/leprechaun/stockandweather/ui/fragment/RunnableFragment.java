@@ -1,4 +1,4 @@
-package com.leprechaun.stockandweather.ui;
+package com.leprechaun.stockandweather.ui.fragment;
 
 import android.app.Fragment;
 import android.os.Bundle;

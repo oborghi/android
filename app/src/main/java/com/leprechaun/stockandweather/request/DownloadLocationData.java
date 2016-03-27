@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -17,10 +16,10 @@ import com.leprechaun.stockandweather.entity.WeatherCurrentCondition;
 import com.leprechaun.stockandweather.entity.WeatherPrevision;
 import com.leprechaun.stockandweather.gps.LocationProvider;
 import com.leprechaun.stockandweather.gps.LocationResult;
-import com.leprechaun.stockandweather.json.HttpMethod;
-import com.leprechaun.stockandweather.json.JSONParser;
-import com.leprechaun.stockandweather.ui.IWeatherActivity;
-import com.leprechaun.stockandweather.ui.WeatherFragment;
+import com.leprechaun.stockandweather.request.json.HttpMethod;
+import com.leprechaun.stockandweather.request.json.JSONParser;
+import com.leprechaun.stockandweather.ui.interfaces.IWeatherActivity;
+import com.leprechaun.stockandweather.ui.fragment.WeatherFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,9 +28,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -45,11 +41,25 @@ public class DownloadLocationData extends AsyncTask<Void, Integer, Weather> {
     private Boolean locationServiceDisabled = false;
     private WeatherFragment fragment;
     private IWeatherActivity mCallbacks;
+    private static Thread threadLocationProvider;
+    private static Thread threadLocationHandler;
 
     public DownloadLocationData(IWeatherActivity mCallbacks)
     {
         this.mCallbacks = mCallbacks;
         this.fragment = mCallbacks.getFragment();
+    }
+
+    @Override
+    protected void onCancelled(Weather ignored)
+    {
+        if(threadLocationProvider != null)
+            if(threadLocationProvider.isAlive())
+                threadLocationProvider.interrupt();
+
+        if(threadLocationHandler != null)
+            if(threadLocationHandler.isAlive())
+                threadLocationHandler.interrupt();
     }
 
     @Override
@@ -66,6 +76,15 @@ public class DownloadLocationData extends AsyncTask<Void, Integer, Weather> {
 
     @Override
     protected void onCancelled() {
+
+        if(threadLocationProvider != null)
+            if(threadLocationProvider.isAlive())
+                threadLocationProvider.interrupt();
+
+        if(threadLocationHandler != null)
+            if(threadLocationHandler.isAlive())
+                threadLocationHandler.interrupt();
+
         if (mCallbacks != null) {
             mCallbacks.onCancelled();
         }
@@ -107,7 +126,11 @@ public class DownloadLocationData extends AsyncTask<Void, Integer, Weather> {
     }
 
     private void createLocationProviderHandler() {
-        Thread thread = new Thread() {
+
+        if(threadLocationProvider != null && threadLocationProvider.isAlive())
+            threadLocationProvider.interrupt();
+
+        threadLocationProvider = new Thread() {
             public void run() {
                 Looper.prepare();
 
@@ -118,8 +141,7 @@ public class DownloadLocationData extends AsyncTask<Void, Integer, Weather> {
                         // Do Work
 
                         provider = new LocationProvider();
-                        if(!provider.getLocation(mCallbacks.getContext(), locationResult))
-                        {
+                        if (!provider.getLocation(mCallbacks.getContext(), locationResult)) {
                             locationServiceDisabled = true;
                         }
 
@@ -132,11 +154,15 @@ public class DownloadLocationData extends AsyncTask<Void, Integer, Weather> {
                 Looper.loop();
             }
         };
-        thread.start();
+        threadLocationProvider.start();
     }
 
     private void createLocationHandler() throws InterruptedException {
-        Thread thread = new Thread() {
+
+        if(threadLocationHandler != null && threadLocationHandler.isAlive())
+            threadLocationHandler.interrupt();
+
+        threadLocationHandler = new Thread() {
             public void run() {
                 Looper.prepare();
                 final int[] maxTries = new int[1];
@@ -163,8 +189,9 @@ public class DownloadLocationData extends AsyncTask<Void, Integer, Weather> {
                 Looper.loop();
             }
         };
-        thread.start();
-        thread.join();
+
+        threadLocationHandler.start();
+        threadLocationHandler.join();
     }
 
     private Weather getWeatherImages(Weather weather) {

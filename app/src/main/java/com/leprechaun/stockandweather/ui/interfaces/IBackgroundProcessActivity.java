@@ -1,4 +1,4 @@
-package com.leprechaun.stockandweather.ui;
+package com.leprechaun.stockandweather.ui.interfaces;
 
 public interface IBackgroundProcessActivity {
     void onPreExecute();

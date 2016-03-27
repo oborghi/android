@@ -7,10 +7,10 @@ import com.leprechaun.quotationandweather.R;
 import com.leprechaun.stockandweather.entity.Stock;
 import com.leprechaun.stockandweather.entity.StockType;
 import com.leprechaun.stockandweather.entity.StockValues;
-import com.leprechaun.stockandweather.json.HttpMethod;
-import com.leprechaun.stockandweather.json.JSONParser;
-import com.leprechaun.stockandweather.ui.IStockActivity;
-import com.leprechaun.stockandweather.ui.StockFragment;
+import com.leprechaun.stockandweather.request.json.HttpMethod;
+import com.leprechaun.stockandweather.request.json.JSONParser;
+import com.leprechaun.stockandweather.ui.interfaces.IStockActivity;
+import com.leprechaun.stockandweather.ui.fragment.StockFragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;

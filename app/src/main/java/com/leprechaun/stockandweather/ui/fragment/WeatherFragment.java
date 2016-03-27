@@ -1,8 +1,9 @@
-package com.leprechaun.stockandweather.ui;
+package com.leprechaun.stockandweather.ui.fragment;
 
 import android.annotation.SuppressLint;
 
 import com.leprechaun.stockandweather.entity.Weather;
+import com.leprechaun.stockandweather.request.thread.RunnableWeatherData;
 
 public class WeatherFragment extends RunnableFragment {
     private Weather weather;
@@ -12,7 +13,7 @@ public class WeatherFragment extends RunnableFragment {
         super();
     }
     @SuppressLint("ValidFragment")
-    public WeatherFragment(Runnable action) {
+    public WeatherFragment(RunnableWeatherData action) {
         super(action);
     }
 

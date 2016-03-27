@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#494a4d</color>
+    <color name="colorPrimary">#181818</color>
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#ff0d00</color>
     <color name="positive_variation">#02891d</color>
     <color name="negative_variation">#c60f05</color>
-    <color name="button_background">#494a4d</color>
+    <color name="button_background">#181818</color>
     <color name="button_foreground">#ffffff</color>
 </resources>

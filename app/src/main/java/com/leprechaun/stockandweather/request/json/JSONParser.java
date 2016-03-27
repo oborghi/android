@@ -1,4 +1,4 @@
-package com.leprechaun.stockandweather.json;
+package com.leprechaun.stockandweather.request.json;
 
 import android.util.Log;
 

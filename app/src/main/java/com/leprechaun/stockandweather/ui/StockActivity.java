@@ -1,4 +1,4 @@
-package com.leprechaun.stockandweather;
+package com.leprechaun.stockandweather.ui;
 
 import android.app.FragmentManager;
 import android.content.Context;
@@ -13,11 +13,11 @@ import android.widget.Toast;
 
 import com.leprechaun.quotationandweather.R;
 import com.leprechaun.stockandweather.entity.Stock;
-import com.leprechaun.stockandweather.request.DownloadStockData;
-import com.leprechaun.stockandweather.ui.AdapterStockList;
-import com.leprechaun.stockandweather.ui.IStockActivity;
-import com.leprechaun.stockandweather.ui.ProgressDialogFragment;
-import com.leprechaun.stockandweather.ui.StockFragment;
+import com.leprechaun.stockandweather.ui.adapters.AdapterStockList;
+import com.leprechaun.stockandweather.ui.interfaces.IStockActivity;
+import com.leprechaun.stockandweather.ui.fragment.ProgressDialogFragment;
+import com.leprechaun.stockandweather.request.thread.RunnableStockData;
+import com.leprechaun.stockandweather.ui.fragment.StockFragment;
 
 import java.util.List;
 
@@ -157,18 +157,7 @@ public class StockActivity extends AppCompatActivity implements IStockActivity {
     }
 
     private StockFragment createRetainedFragment() {
-
-        final IStockActivity mCallbacks = this;
-
-        Runnable asyncRun = new Runnable() {
-            @Override
-            public void run() {
-                new DownloadStockData(mCallbacks).execute();
-            }
-        };
-
-        retainedFragment = new StockFragment(asyncRun);
-
+        retainedFragment = new StockFragment(new RunnableStockData(this));
         return retainedFragment;
     }
 }
