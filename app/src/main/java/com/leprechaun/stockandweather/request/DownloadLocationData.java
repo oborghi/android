@@ -87,7 +87,7 @@ public class DownloadLocationData extends AsyncTask<Void, Integer, Weather> {
         try {
             createLocationHandler();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Log.e("Location Services Error", "Error on running background thread " + e.toString());
         }
 
         String city = getCity(currentLocation);
