@@ -14,9 +14,6 @@ import com.leprechaun.stockandweather.entity.WeatherPrevision;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Created by oborghi on 17/03/16 - 19:12.
- */
 public class AdapterPrevisionList extends ArrayAdapter<WeatherPrevision> {
 
     final Locale brazilLocale = new Locale("pt", "BR");

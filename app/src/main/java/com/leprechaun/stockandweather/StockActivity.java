@@ -1,11 +1,8 @@
 package com.leprechaun.stockandweather;
 
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ListView;
@@ -15,74 +12,43 @@ import com.leprechaun.quotationandweather.R;
 import com.leprechaun.stockandweather.entity.Stock;
 import com.leprechaun.stockandweather.request.DownloadStockData;
 import com.leprechaun.stockandweather.ui.AdapterStockList;
-import com.leprechaun.stockandweather.ui.StockAndWeatherApp;
+import com.leprechaun.stockandweather.ui.IStockActivity;
+import com.leprechaun.stockandweather.ui.ProgressDialogFragment;
+import com.leprechaun.stockandweather.ui.StockFragment;
 
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
-public class StockActivity extends AppCompatActivity {
+public class StockActivity extends AppCompatActivity implements IStockActivity {
 
     private ListView listQuotation;
-    private static StockActivity currentActivity;
     private TextView labelWarning;
-    private Timer timer;
-    private Handler handler;
-    private Runnable runnable;
 
-    private static volatile ProgressDialog dialog;
-    private AlertDialog errorDialog;
+    //private AlertDialog errorDialog;
 
-    public static ProgressDialog getDialog() {
-        return dialog;
-    }
+    private StockFragment retainedFragment;
+    private static StockActivity instance;
 
-    public static void setDialog(ProgressDialog dialog) {
-        StockActivity.dialog = dialog;
-    }
-
+    private final String retained = "retainedStock";
+    private final String retainedProcess = "retainedStockProcess";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stock);
 
+        instance = this;
+
         listQuotation = (ListView) findViewById(R.id.listQuotation);
         labelWarning = (TextView) findViewById(R.id.labelWarning);
 
-        currentActivity = this;
+        retainedFragment = getRetainedFragment();
 
-        setDialog(ProgressDialog.show(this
-                , this.getResources().getString(R.string.dialog_wait)
-                , this.getResources().getString(R.string.dialog_wait_message)));
-
-        errorDialog = new AlertDialog.Builder(this)
-                .setTitle(R.string.dialog_attention)
-                .setMessage(R.string.dialog_get_stock_error)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        errorDialog.dismiss();
-                    }
-                }).create();
-
-        handler = new Handler();
-        runnable = new Runnable() {
-            @Override
-            public void run() {
-                if (errorDialog.isShowing()) {
-                    errorDialog.dismiss();
-                }
-            }
-        };
-
-        errorDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                handler.removeCallbacks(runnable);
-            }
-        });
-
-        handler.postDelayed(runnable, 5000);
+        if (retainedFragment == null) {
+            retainedFragment = createRetainedFragment();
+            setRetainedFragment(retainedFragment);
+        } else {
+            updateQuotationView(retainedFragment.getStockList());
+        }
     }
 
     public void showWeather(View view){
@@ -93,92 +59,96 @@ public class StockActivity extends AppCompatActivity {
 
     public void updateQuotationView(List<Stock> result)
     {
-        if(getDialog() != null) {
-            getDialog().dismiss();
-            setDialog(null);
-        }
 
         if(result != null){
             if(result.size() > 0)
             {
                 AdapterStockList adapter = new AdapterStockList(this, R.layout.item_list_instrument, result);
-                this.getListQuotation().setAdapter(adapter);
+                instance.listQuotation.setAdapter(adapter);
             }
+
+            closeProcessDialog();
         }
-        else
-        {
-            errorDialog.show();
-        }
+
+        //TODO: add error dialog fragment
+//        else
+//        {
+//            errorDialog.show();
+//        }
 
         labelWarning.setVisibility(View.VISIBLE);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        StockAndWeatherApp.activityQuotationResumed();
-        backgroundGetQuotation();
+    public StockFragment getRetainedFragment() {
+        return (StockFragment) getFragmentManager().findFragmentByTag(retained);
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        timer.cancel();
-        StockAndWeatherApp.activityQuotationPaused();
+    public StockFragment getFragment() {
+        return retainedFragment;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        StockAndWeatherApp.activityQuotationStart();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        timer.cancel();
-        StockAndWeatherApp.activityQuotationStop();
-    }
-
-    public ListView getListQuotation() {
-        return listQuotation;
-    }
-
-    public static StockActivity getCurrentActivity()
+    public void setRetainedFragment(StockFragment fragment)
     {
-        return currentActivity;
+        FragmentManager fm = getFragmentManager();
+        fm.beginTransaction().add(fragment, retained).commit();
     }
 
-    private void backgroundGetQuotation() {
-        //Atualiza cotação a cada 5 minutos.
-
-        if(timer != null)
-            timer.cancel();
-
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
-            public void run() {
-                updateData();
-            }
-        }, 0, 5*60*1000);
+    @Override
+    public void onPreExecute() {
+        showProcessDialog();
     }
 
-    private void updateData() {
-        if(StockAndWeatherApp.isActivityQuotationVisible()) {
-            getCurrentActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (getDialog() == null) {
-                        setDialog(ProgressDialog.show(StockActivity.getCurrentActivity()
-                                , StockActivity.getCurrentActivity().getResources().getString(R.string.dialog_wait)
-                                , StockActivity.getCurrentActivity().getResources().getString(R.string.dialog_wait_message)));
-                    }
+    @Override
+    public void onProgressUpdate(int percent) {
 
-                }
-            });
+    }
 
-            new DownloadStockData(StockActivity.getCurrentActivity())
-                    .execute(getResources().getString(R.string.quotation_url));
+    @Override
+    public void onCancelled() {
+
+    }
+
+    @Override
+    public void onPostExecute() {
+        StockFragment fragment = getRetainedFragment();
+        if (fragment != null)
+        {
+            updateQuotationView(fragment.getStockList());
         }
+    }
+
+    private void showProcessDialog() {
+        FragmentManager fm = getFragmentManager();
+        ProgressDialogFragment dialogFragment = ProgressDialogFragment.newInstance();
+        dialogFragment.show(fm, retainedProcess);
+    }
+
+    private ProgressDialogFragment getProcessDialog() {
+        return (ProgressDialogFragment) getFragmentManager().findFragmentByTag(retainedProcess);
+    }
+
+    public void closeProcessDialog() {
+        ProgressDialogFragment dialogFragment = getProcessDialog();
+
+        if (dialogFragment != null) {
+            dialogFragment.dismiss();
+        }
+    }
+
+    private StockFragment createRetainedFragment() {
+
+        final IStockActivity mCallbacks = this;
+
+        Runnable asyncRun = new Runnable() {
+            @Override
+            public void run() {
+                new DownloadStockData(mCallbacks).execute();
+            }
+        };
+
+        retainedFragment = new StockFragment(asyncRun);
+
+        return retainedFragment;
     }
 }

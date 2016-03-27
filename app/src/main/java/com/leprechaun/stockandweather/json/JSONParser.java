@@ -22,9 +22,6 @@ import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
-/**
- * Created by oborghi on 16/03/16.
- */
 public class JSONParser {
 
        // function get json from url

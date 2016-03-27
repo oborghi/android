@@ -1,8 +1,5 @@
 package com.leprechaun.stockandweather.entity;
 
-/**
- * Created by oborghi on 17/03/16.
- */
 public class Stock {
     private StockType type;
     private double value;

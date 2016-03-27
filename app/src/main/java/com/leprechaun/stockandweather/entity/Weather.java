@@ -2,9 +2,6 @@ package com.leprechaun.stockandweather.entity;
 
 import java.util.List;
 
-/**
- * Created by oborghi on 19/03/16.
- */
 public class Weather {
 
     private String city;

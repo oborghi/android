@@ -7,9 +7,6 @@ import android.os.Bundle;
 
 import com.leprechaun.quotationandweather.R;
 
-/**
- * Created by oborghi on 26/03/16 - 00:47.
- */
 public class ProgressDialogFragment extends DialogFragment {
 
     private static final String ARG_MESSAGE = "message";

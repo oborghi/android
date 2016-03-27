@@ -2,9 +2,6 @@ package com.leprechaun.stockandweather.entity;
 
 import android.graphics.Bitmap;
 
-/**
- * Created by oborghi on 19/03/16.
- */
 public class WeatherPrevision {
 
     private String date;

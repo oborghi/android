@@ -2,14 +2,8 @@ package com.leprechaun.stockandweather.entity;
 
 import android.graphics.Bitmap;
 
-import java.util.Date;
-import java.util.List;
-
-/**
- * Created by oborghi on 19/03/16.
- */
 public class WeatherCurrentCondition {
-    private Date dateAndTime;
+
     private String description;
     private int temperature;
     private String humidity;
@@ -23,14 +17,6 @@ public class WeatherCurrentCondition {
     private String imageUrl;
     private Bitmap image;
 
-
-    public Date getDateAndTime() {
-        return dateAndTime;
-    }
-
-    public void setDateAndTime(Date dateAndTime) {
-        this.dateAndTime = dateAndTime;
-    }
 
     public String getDescription() {
         return description;
@@ -127,6 +113,5 @@ public class WeatherCurrentCondition {
     public void setImage(Bitmap image) {
         this.image = image;
     }
-
 
 }

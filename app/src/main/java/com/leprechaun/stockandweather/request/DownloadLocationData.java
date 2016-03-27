@@ -1,6 +1,5 @@
 package com.leprechaun.stockandweather.request;
 
-import android.app.FragmentManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
@@ -37,9 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Created by oborghi on 20/03/16 - 19:13.
- */
 public class DownloadLocationData extends AsyncTask<Void, Integer, Weather> {
 
     private LocationProvider provider;
@@ -343,10 +339,6 @@ public class DownloadLocationData extends AsyncTask<Void, Integer, Weather> {
 
                     if (weatherCurrentConditionJson != null) {
                         WeatherCurrentCondition weatherCurrentCondition = new WeatherCurrentCondition();
-
-                        String dateAndTime = weatherCurrentConditionJson.getString("data_hora");
-                        if (dateAndTime != null)
-                            weatherCurrentCondition.setDateAndTime(getWeatherDate(dateAndTime));
 
                         String description = weatherCurrentConditionJson.getString("descricao");
                         if (description != null)

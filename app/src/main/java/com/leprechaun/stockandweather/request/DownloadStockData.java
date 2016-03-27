@@ -3,12 +3,14 @@ package com.leprechaun.stockandweather.request;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.leprechaun.stockandweather.StockActivity;
+import com.leprechaun.quotationandweather.R;
 import com.leprechaun.stockandweather.entity.Stock;
 import com.leprechaun.stockandweather.entity.StockType;
 import com.leprechaun.stockandweather.entity.StockValues;
 import com.leprechaun.stockandweather.json.HttpMethod;
 import com.leprechaun.stockandweather.json.JSONParser;
+import com.leprechaun.stockandweather.ui.IStockActivity;
+import com.leprechaun.stockandweather.ui.StockFragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,28 +19,51 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by oborghi on 17/03/16 - 19:13.
- */
-public class DownloadStockData extends AsyncTask<String, Void, List<Stock>> {
+public class DownloadStockData extends AsyncTask<Void, Integer, List<Stock>> {
 
-    StockActivity activity;
+    private StockFragment fragment;
+    private IStockActivity mCallbacks;
 
-    public DownloadStockData(StockActivity activity)
+
+    public DownloadStockData(IStockActivity mCallbacks)
     {
-        this.activity = activity;
+        this.mCallbacks = mCallbacks;
+        this.fragment = mCallbacks.getFragment();
     }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        mCallbacks.onPreExecute();
     }
 
     @Override
-    protected List<Stock> doInBackground(String... params) {
+    protected void onProgressUpdate(Integer... values) {
+        super.onProgressUpdate();
+        mCallbacks.onProgressUpdate(values[0]);
+    }
+
+    @Override
+    protected void onCancelled() {
+        if (mCallbacks != null) {
+            mCallbacks.onCancelled();
+        }
+    }
+
+    @Override
+    protected void onPostExecute(List<Stock> result)
+    {
+        super.onPostExecute(result);
+        fragment.setStockList(result);
+        mCallbacks.onPostExecute();
+    }
+
+
+    @Override
+    protected List<Stock> doInBackground(Void... ignored) {
         JSONParser jsonRequest = new JSONParser();
 
-        String urlString = params[0];
+        String urlString = mCallbacks.getResources().getString(R.string.stock_url);
 
         try {
 
@@ -52,13 +77,6 @@ public class DownloadStockData extends AsyncTask<String, Void, List<Stock>> {
         }
 
         return null;
-    }
-
-    @Override
-    protected void onPostExecute(List<Stock> result)
-    {
-        super.onPostExecute(result);
-        activity.updateQuotationView(result);
     }
 
     private List<Stock> getQuotations(JSONObject json) throws JSONException

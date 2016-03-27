@@ -1,12 +1,7 @@
 package com.leprechaun.stockandweather.entity;
 
-/**
- * Created by oborghi on 17/03/16.
- */
 public enum StockType {
-    /**
-     * Tipos de cotação
-     */
+
     BOVESPA ("bovespa"),
     DOLAR ("dolar"),
     EURO ("euro");
@@ -15,10 +10,6 @@ public enum StockType {
 
     StockType(String s) {
         name = s;
-    }
-
-    public boolean equalsName(String otherName) {
-        return (otherName == null) ? false : name.equals(otherName);
     }
 
     public String toString() {

@@ -20,9 +20,6 @@ import com.leprechaun.stockandweather.request.DownloadLocationData;
 import com.leprechaun.stockandweather.ui.AdapterPrevisionList;
 import com.leprechaun.stockandweather.ui.IWeatherActivity;
 import com.leprechaun.stockandweather.ui.ProgressDialogFragment;
-//import com.leprechaun.stockandweather.ui.StockAndWeatherApp;
-import com.leprechaun.stockandweather.ui.TaskControl;
-import com.leprechaun.stockandweather.ui.TaskStatus;
 import com.leprechaun.stockandweather.ui.WeatherFragment;
 
 import java.util.List;
@@ -51,8 +48,8 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherActivi
     private static final Locale brasilLocale = new Locale("pt", "BR");
 //    private AlertDialog errorDialog;
 
-    private final String retainedWeather = "retainedWeather";
-    private final String retainedProcessDialog = "retainedProcessDialog";
+    private final String retained = "retainedWeather";
+    private final String retainedProcess = "retainedWeatherProcess";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,30 +88,6 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherActivi
         super.onPostCreate(savedInstanceState);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-//        StockAndWeatherApp.activityWeatherResumed();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-//        StockAndWeatherApp.activityWeatherPaused();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-//        StockAndWeatherApp.activityWeatherStart();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-//        StockAndWeatherApp.activityWeatherStop();
-    }
-
     public void showQuotation(View view){
         Intent intentCall = new Intent(this, StockActivity.class);
         this.startActivity(intentCall);
@@ -124,7 +97,7 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherActivi
     //Interface Methods
 
     public WeatherFragment getRetainedFragment() {
-        return (WeatherFragment) getFragmentManager().findFragmentByTag(retainedWeather);
+        return (WeatherFragment) getFragmentManager().findFragmentByTag(retained);
     }
 
     @Override
@@ -135,7 +108,7 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherActivi
     public void setRetainedFragment(WeatherFragment fragment)
     {
         FragmentManager fm = getFragmentManager();
-        fm.beginTransaction().add(fragment, retainedWeather).commit();
+        fm.beginTransaction().add(fragment, retained).commit();
     }
 
     @Override
@@ -200,6 +173,9 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherActivi
 
             closeProcessDialog();
         }
+
+        //TODO: add error dialog fragment
+
 //        else
 //        {
 //            ShowDialog(R.string.dialog_get_weather_info_error);
@@ -209,11 +185,11 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherActivi
     private void showProcessDialog() {
         FragmentManager fm = getFragmentManager();
         ProgressDialogFragment dialogFragment = ProgressDialogFragment.newInstance();
-        dialogFragment.show(fm, retainedProcessDialog);
+        dialogFragment.show(fm, retainedProcess);
     }
 
     private ProgressDialogFragment getProcessDialog() {
-        return (ProgressDialogFragment) getFragmentManager().findFragmentByTag(retainedProcessDialog);
+        return (ProgressDialogFragment) getFragmentManager().findFragmentByTag(retainedProcess);
     }
 
     public void closeProcessDialog() {
@@ -262,16 +238,14 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherActivi
 
         final IWeatherActivity mCallbacks = this;
 
-        class WeatherTaskControl extends TaskControl {
-
+        Runnable asyncRun = new Runnable() {
             @Override
-            protected void executeTask() {
-                setStatus(TaskStatus.Called);
+            public void run() {
                 new DownloadLocationData(mCallbacks).execute();
             }
-        }
+        };
 
-        retainedFragment = new WeatherFragment(new WeatherTaskControl());
+        retainedFragment = new WeatherFragment(asyncRun);
 
         return retainedFragment;
     }

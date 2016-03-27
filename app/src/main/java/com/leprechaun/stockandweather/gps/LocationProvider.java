@@ -12,9 +12,6 @@ import android.support.v4.app.ActivityCompat;
 import java.util.Timer;
 import java.util.TimerTask;
 
-/**
- * Created by oborghi on 19/03/16 - 19:12.
- */
 public class LocationProvider {
 
     Timer timer1;
