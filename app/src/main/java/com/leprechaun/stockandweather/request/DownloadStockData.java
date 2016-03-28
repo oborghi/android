@@ -3,7 +3,7 @@ package com.leprechaun.stockandweather.request;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.leprechaun.quotationandweather.R;
+import com.leprechaun.stockandweather.R;
 import com.leprechaun.stockandweather.entity.Stock;
 import com.leprechaun.stockandweather.entity.StockType;
 import com.leprechaun.stockandweather.entity.StockValues;

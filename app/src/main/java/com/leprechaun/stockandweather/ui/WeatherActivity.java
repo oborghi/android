@@ -16,7 +16,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.leprechaun.quotationandweather.R;
+import com.leprechaun.stockandweather.R;
 import com.leprechaun.stockandweather.entity.Weather;
 import com.leprechaun.stockandweather.entity.WeatherCurrentCondition;
 import com.leprechaun.stockandweather.entity.WeatherPrevision;
@@ -105,7 +105,6 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherActivi
         {
             case R.id.menu_item_stock:
                 startActivity(new Intent(this, StockActivity.class));
-                finish();
                 return true;
             default:
                 return false;

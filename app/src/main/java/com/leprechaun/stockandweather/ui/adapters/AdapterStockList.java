@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.leprechaun.quotationandweather.R;
+import com.leprechaun.stockandweather.R;
 import com.leprechaun.stockandweather.entity.Stock;
 
 import java.util.List;

@@ -10,7 +10,7 @@ import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.leprechaun.quotationandweather.R;
+import com.leprechaun.stockandweather.R;
 import com.leprechaun.stockandweather.entity.Weather;
 import com.leprechaun.stockandweather.entity.WeatherCurrentCondition;
 import com.leprechaun.stockandweather.entity.WeatherPrevision;

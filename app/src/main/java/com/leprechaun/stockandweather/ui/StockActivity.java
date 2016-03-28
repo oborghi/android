@@ -11,13 +11,13 @@ import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.leprechaun.quotationandweather.R;
+import com.leprechaun.stockandweather.R;
 import com.leprechaun.stockandweather.entity.Stock;
-import com.leprechaun.stockandweather.ui.adapters.AdapterStockList;
-import com.leprechaun.stockandweather.ui.interfaces.IStockActivity;
-import com.leprechaun.stockandweather.ui.fragment.ProgressDialogFragment;
 import com.leprechaun.stockandweather.request.thread.RunnableStockData;
+import com.leprechaun.stockandweather.ui.adapters.AdapterStockList;
+import com.leprechaun.stockandweather.ui.fragment.ProgressDialogFragment;
 import com.leprechaun.stockandweather.ui.fragment.StockFragment;
+import com.leprechaun.stockandweather.ui.interfaces.IStockActivity;
 
 import java.util.List;
 
@@ -47,34 +47,29 @@ public class StockActivity extends AppCompatActivity implements IStockActivity {
         } else {
             updateQuotationView(retainedFragment.getStockList());
         }
+
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.stock_menu, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem menuItem)
-    {
-        switch (menuItem.getItemId())
-        {
-            case R.id.menu_item_weather :
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.menu_item_weather:
                 startActivity(new Intent(this, WeatherActivity.class));
-                finish();
                 return true;
             default:
                 return false;
         }
     }
 
-    public void updateQuotationView(List<Stock> result)
-    {
-        if(result != null){
-            if(result.size() > 0)
-            {
+    public void updateQuotationView(List<Stock> result) {
+        if (result != null) {
+            if (result.size() > 0) {
                 AdapterStockList adapter = new AdapterStockList(this, R.layout.item_list_instrument, result);
                 instance.listQuotation.setAdapter(adapter);
             }
@@ -86,8 +81,7 @@ public class StockActivity extends AppCompatActivity implements IStockActivity {
         return (StockFragment) getFragmentManager().findFragmentByTag(retained);
     }
 
-    public void setRetainedFragment(StockFragment fragment)
-    {
+    public void setRetainedFragment(StockFragment fragment) {
         FragmentManager fm = getFragmentManager();
         fm.beginTransaction().add(fragment, retained).commit();
     }
@@ -98,8 +92,7 @@ public class StockActivity extends AppCompatActivity implements IStockActivity {
     }
 
     @Override
-    public void showError()
-    {
+    public void showError() {
         closeProcessDialog();
         showToast(R.string.dialog_get_stock_error);
     }
@@ -122,14 +115,12 @@ public class StockActivity extends AppCompatActivity implements IStockActivity {
     @Override
     public void onPostExecute() {
         StockFragment fragment = getRetainedFragment();
-        if (fragment != null)
-        {
+        if (fragment != null) {
             updateQuotationView(fragment.getStockList());
         }
     }
 
-    public void showToast(final @StringRes int id)
-    {
+    public void showToast(final @StringRes int id) {
         Context context = getApplicationContext();
         CharSequence text = getString(id);
         int duration = Toast.LENGTH_LONG;

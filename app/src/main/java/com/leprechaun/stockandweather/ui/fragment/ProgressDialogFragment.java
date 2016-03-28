@@ -5,7 +5,7 @@ import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 
-import com.leprechaun.quotationandweather.R;
+import com.leprechaun.stockandweather.R;
 
 public class ProgressDialogFragment extends DialogFragment {
 
