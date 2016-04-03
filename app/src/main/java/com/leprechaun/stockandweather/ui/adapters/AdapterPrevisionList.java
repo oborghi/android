@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.leprechaun.stockandweather.R;
 import com.leprechaun.stockandweather.entity.WeatherPrevision;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 import java.util.Locale;
@@ -58,7 +59,12 @@ public class AdapterPrevisionList extends ArrayAdapter<WeatherPrevision> {
             }
 
             if(imagePrevision != null){
-                imagePrevision.setImageBitmap(item.getImage());
+                if(item.getImageUrl() != null) {
+                    Picasso.with(getContext()).load(item.getImageUrl()).fit().into(imagePrevision);
+                }
+                else {
+                    Picasso.with(getContext()).load(R.drawable.cannot_be_load).fit().into(imagePrevision);
+                }
             }
         }
 

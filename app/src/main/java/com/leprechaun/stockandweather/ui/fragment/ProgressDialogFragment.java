@@ -35,17 +35,6 @@ public class ProgressDialogFragment extends DialogFragment {
         return progressDialogFragment;
     }
 
-//    public static ProgressDialogFragment newInstance(String message, boolean indeterminate, boolean cancelable) {
-//        Bundle args = new Bundle();
-//        args.putString(ARG_MESSAGE, message);
-//        args.putBoolean(ARG_INDETERMINATE, indeterminate);
-//
-//        ProgressDialogFragment progressDialogFragment = new ProgressDialogFragment();
-//        progressDialogFragment.setArguments(args);
-//        progressDialogFragment.setCancelable(cancelable);
-//        return progressDialogFragment;
-//    }
-
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         super.onCreateDialog(savedInstanceState);

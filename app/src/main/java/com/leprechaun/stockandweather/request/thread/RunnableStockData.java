@@ -20,12 +20,16 @@ public class RunnableStockData implements Runnable {
 
     @Override
     public void run() {
+        cancel();
+        asyncTask = new DownloadStockData(callbacks);
+        asyncTask.execute();
+    }
+
+    public void cancel()
+    {
         if(asyncTask != null && asyncTask.getStatus() == AsyncTask.Status.RUNNING)
         {
             asyncTask.cancel(true);
         }
-
-        asyncTask = new DownloadStockData(callbacks);
-        asyncTask.execute();
     }
 }

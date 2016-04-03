@@ -1,7 +1,5 @@
 package com.leprechaun.stockandweather.request;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -18,17 +16,15 @@ import com.leprechaun.stockandweather.gps.LocationProvider;
 import com.leprechaun.stockandweather.gps.LocationResult;
 import com.leprechaun.stockandweather.request.json.HttpMethod;
 import com.leprechaun.stockandweather.request.json.JSONParser;
-import com.leprechaun.stockandweather.ui.interfaces.IWeatherActivity;
 import com.leprechaun.stockandweather.ui.fragment.WeatherFragment;
+import com.leprechaun.stockandweather.ui.interfaces.IWeatherActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -115,14 +111,7 @@ public class DownloadLocationData extends AsyncTask<Void, Integer, Weather> {
             return null;
         }
 
-        Weather weather = getWeather(city);
-
-        if(weather != null)
-        {
-            weather = getWeatherImages(weather);
-        }
-
-        return weather;
+        return getWeather(city);
     }
 
     private void createLocationProviderHandler() {
@@ -192,86 +181,6 @@ public class DownloadLocationData extends AsyncTask<Void, Integer, Weather> {
 
         threadLocationHandler.start();
         threadLocationHandler.join();
-    }
-
-    private Weather getWeatherImages(Weather weather) {
-
-        if (weather != null) {
-            List<String> imagesUrls = new ArrayList<>();
-
-            if (weather.getCurrentCondition() != null)
-                imagesUrls.add(weather.getCurrentCondition().getImageUrl());
-
-            if (weather.getPrevisions() != null)
-                for (WeatherPrevision weatherPrevision : weather.getPrevisions()) {
-                    imagesUrls.add(weatherPrevision.getImageUrl());
-                }
-
-            String[] urls = new String[imagesUrls.size()];
-            imagesUrls.toArray(urls);
-
-            HashMap<String,Bitmap> imagesData = null;
-
-            if (urls.length > 0) {
-                for (String urlDisplay : urls) {
-
-                    Bitmap mIcon11;
-                    Boolean containsImage = false;
-
-                    try {
-
-                        if (imagesData != null) {
-                            containsImage = imagesData.containsKey(urlDisplay);
-                        }
-
-                        if (!containsImage) {
-                            InputStream in = new java.net.URL(urlDisplay).openStream();
-                            mIcon11 = BitmapFactory.decodeStream(in);
-
-                            if (imagesData == null)
-                                imagesData = new HashMap<>();
-
-                            imagesData.put(urlDisplay, mIcon11);
-                        }
-                    } catch (Exception e) {
-                        Log.e("Image Download", "Error Downloading Image " + e.toString());
-
-                        mIcon11 = BitmapFactory.decodeResource(fragment.getResources(), R.drawable.cannot_be_load);
-
-                        if (imagesData == null)
-                            imagesData = new HashMap<>();
-
-                        imagesData.put(urlDisplay, mIcon11);
-                    }
-                }
-            }
-
-            WeatherCurrentCondition weatherCurrentCondition = weather.getCurrentCondition();
-
-            if (weatherCurrentCondition != null) {
-                Bitmap currentConditionImage = imagesData != null ? imagesData.get(weatherCurrentCondition.getImageUrl()) : null;
-
-                if (currentConditionImage != null)
-                    weatherCurrentCondition.setImage(currentConditionImage);
-
-                weather.setCurrentCondition(weatherCurrentCondition);
-            }
-
-            List<WeatherPrevision> weatherPrevisions = weather.getPrevisions();
-
-            if(weatherPrevisions != null){
-                for (WeatherPrevision weatherPrevision : weatherPrevisions) {
-                    Bitmap previsionImage = imagesData != null ? imagesData.get(weatherPrevision.getImageUrl()) : null;
-                    if (previsionImage != null) {
-                        weatherPrevision.setImage(previsionImage);
-                    }
-                }
-
-                weather.setPrevisions(weatherPrevisions);
-            }
-        }
-
-        return weather;
     }
 
     @Nullable

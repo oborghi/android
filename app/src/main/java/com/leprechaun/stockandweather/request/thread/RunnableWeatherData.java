@@ -18,12 +18,16 @@ public class RunnableWeatherData implements Runnable {
 
     @Override
     public void run() {
+        cancel();
+        asyncTask = new DownloadLocationData(callbacks);
+        asyncTask.execute();
+    }
+
+    public void cancel()
+    {
         if(asyncTask != null && asyncTask.getStatus() == AsyncTask.Status.RUNNING)
         {
             asyncTask.cancel(true);
         }
-
-        asyncTask = new DownloadLocationData(callbacks);
-        asyncTask.execute();
     }
 }

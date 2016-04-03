@@ -6,8 +6,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -18,17 +20,22 @@ import com.leprechaun.stockandweather.ui.adapters.AdapterStockList;
 import com.leprechaun.stockandweather.ui.fragment.ProgressDialogFragment;
 import com.leprechaun.stockandweather.ui.fragment.StockFragment;
 import com.leprechaun.stockandweather.ui.interfaces.IStockActivity;
+import com.leprechaun.stockandweather.ui.swipe.ISwipeActivity;
+import com.leprechaun.stockandweather.ui.swipe.SwipeGestureDetector;
 
 import java.util.List;
 
-public class StockActivity extends AppCompatActivity implements IStockActivity {
+public class StockActivity extends AppCompatActivity implements IStockActivity, ISwipeActivity {
 
     private static StockActivity instance;
-    private final String retained = "retainedStock";
 
+    private final String retained = "retainedStock";
     private final String retainedProcess = "retainedStockProcess";
+
     private ListView listQuotation;
     private StockFragment retainedFragment;
+    private static volatile RunnableStockData runnableStockData;
+    private GestureDetector gestureDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +43,8 @@ public class StockActivity extends AppCompatActivity implements IStockActivity {
         setContentView(R.layout.activity_stock);
 
         instance = this;
+        gestureDetector = new GestureDetector(
+                new SwipeGestureDetector(this));
 
         listQuotation = (ListView) findViewById(R.id.listQuotation);
 
@@ -47,7 +56,6 @@ public class StockActivity extends AppCompatActivity implements IStockActivity {
         } else {
             updateQuotationView(retainedFragment.getStockList());
         }
-
     }
 
     @Override
@@ -62,6 +70,13 @@ public class StockActivity extends AppCompatActivity implements IStockActivity {
             case R.id.menu_item_weather:
                 startActivity(new Intent(this, WeatherActivity.class));
                 return true;
+
+            case R.id.menu_item_refresh:
+                deleteRetainedFragment();
+                retainedFragment = createRetainedFragment();
+                setRetainedFragment(retainedFragment);
+                return true;
+
             default:
                 return false;
         }
@@ -79,6 +94,19 @@ public class StockActivity extends AppCompatActivity implements IStockActivity {
 
     public StockFragment getRetainedFragment() {
         return (StockFragment) getFragmentManager().findFragmentByTag(retained);
+    }
+
+    public void deleteRetainedFragment() {
+        FragmentManager fm = getFragmentManager();
+        StockFragment fragment = getRetainedFragment();
+
+        if(runnableStockData != null)
+            runnableStockData.cancel();
+
+        if(fragment != null)
+            fm.beginTransaction().remove(fragment).commitAllowingStateLoss();
+
+        retainedFragment = null;
     }
 
     public void setRetainedFragment(StockFragment fragment) {
@@ -131,7 +159,7 @@ public class StockActivity extends AppCompatActivity implements IStockActivity {
 
     private void showProcessDialog() {
         FragmentManager fm = getFragmentManager();
-        ProgressDialogFragment dialogFragment = ProgressDialogFragment.newInstance();
+        ProgressDialogFragment dialogFragment = ProgressDialogFragment.newInstance(R.string.dialog_wait_message, false, false);
         dialogFragment.show(fm, retainedProcess);
     }
 
@@ -148,7 +176,29 @@ public class StockActivity extends AppCompatActivity implements IStockActivity {
     }
 
     private StockFragment createRetainedFragment() {
-        retainedFragment = new StockFragment(new RunnableStockData(this));
+
+        if(runnableStockData != null)
+            runnableStockData.cancel();
+
+        runnableStockData = new RunnableStockData(this);
+        retainedFragment = new StockFragment(runnableStockData);
+
         return retainedFragment;
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        return gestureDetector.onTouchEvent(event) || super.dispatchTouchEvent(event);
+    }
+
+
+    @Override
+    public void onLeftSwipe() {
+        startActivity(new Intent(this, WeatherActivity.class));
+    }
+
+    @Override
+    public void onRightSwipe() {
+
     }
 }

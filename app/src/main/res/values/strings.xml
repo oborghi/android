@@ -12,7 +12,7 @@
     <string name="dialog_wait_message">Carregando...</string>
     <string name="dialog_get_stock_error">Informações de cotação indisponíveis no momento.</string>
     <string name="dialog_get_weather_info_error">Informações de tempo indisponíveis no momento.</string>
-    <string name="warning_message">*Os Valores são atualizados automaticamente a cada 5 minutos.</string>
+    <string name="button_refresh">Clique aqui para atualizar os dados.</string>
     <string name="button_weather">Clique na imagem para informações de Tempo.</string>
     <string name="button_stock">Clique na imagem para informações de Cotação.</string>
     <string name="label_pressure">Pressão:</string>
