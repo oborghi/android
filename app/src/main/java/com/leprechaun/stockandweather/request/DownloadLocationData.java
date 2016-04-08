@@ -157,7 +157,7 @@ public class DownloadLocationData extends AsyncTask<Void, Integer, Weather> {
                 final int[] maxTries = new int[1];
 
                 final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
+                handler.post(new Runnable() {
                     @Override
                     public void run() {
                         // Do Work
@@ -173,7 +173,7 @@ public class DownloadLocationData extends AsyncTask<Void, Integer, Weather> {
                             Looper.myLooper().quit();
                         }
                     }
-                }, 1000);
+                });
 
                 Looper.loop();
             }

@@ -9,7 +9,7 @@ import com.leprechaun.stockandweather.ui.interfaces.IWeatherActivity;
 public class RunnableWeatherData implements Runnable {
 
     private IWeatherActivity callbacks;
-    private static AsyncTask<Void, Integer, Weather> asyncTask;
+    private static volatile AsyncTask<Void, Integer, Weather> asyncTask;
 
     public RunnableWeatherData(IWeatherActivity callbacks)
     {
@@ -18,9 +18,10 @@ public class RunnableWeatherData implements Runnable {
 
     @Override
     public void run() {
-        cancel();
-        asyncTask = new DownloadLocationData(callbacks);
-        asyncTask.execute();
+        if(asyncTask == null || asyncTask.getStatus() == AsyncTask.Status.FINISHED) {
+            asyncTask = new DownloadLocationData(callbacks);
+            asyncTask.execute();
+        }
     }
 
     public void cancel()
@@ -28,6 +29,7 @@ public class RunnableWeatherData implements Runnable {
         if(asyncTask != null && asyncTask.getStatus() == AsyncTask.Status.RUNNING)
         {
             asyncTask.cancel(true);
+            asyncTask = null;
         }
     }
 }

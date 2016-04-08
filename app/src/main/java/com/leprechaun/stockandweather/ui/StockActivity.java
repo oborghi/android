@@ -33,7 +33,7 @@ public class StockActivity extends AppCompatActivity implements IStockActivity, 
     private final String retainedProcess = "retainedStockProcess";
 
     private ListView listQuotation;
-    private StockFragment retainedFragment;
+    private static volatile StockFragment retainedFragment;
     private static volatile RunnableStockData runnableStockData;
     private GestureDetector gestureDetector;
 
@@ -48,11 +48,13 @@ public class StockActivity extends AppCompatActivity implements IStockActivity, 
 
         listQuotation = (ListView) findViewById(R.id.listQuotation);
 
-        retainedFragment = getRetainedFragment();
+        if (retainedFragment == null)
+            retainedFragment = getRetainedFragment();
 
         if (retainedFragment == null) {
-            retainedFragment = createRetainedFragment();
-            setRetainedFragment(retainedFragment);
+            StockFragment tempFragment = createRetainedFragment();
+            setRetainedFragment(tempFragment);
+            retainedFragment = tempFragment;
         } else {
             updateQuotationView(retainedFragment.getStockList());
         }
@@ -73,8 +75,9 @@ public class StockActivity extends AppCompatActivity implements IStockActivity, 
 
             case R.id.menu_item_refresh:
                 deleteRetainedFragment();
-                retainedFragment = createRetainedFragment();
-                setRetainedFragment(retainedFragment);
+                StockFragment tempFragment = createRetainedFragment();
+                setRetainedFragment(tempFragment);
+                retainedFragment = tempFragment;
                 return true;
 
             default:

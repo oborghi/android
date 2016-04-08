@@ -32,12 +32,12 @@ public abstract class RunnableFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        if (this.thread != null) {
-            if (thread.isAlive()) {
-                thread.interrupt();
-                thread = null;
-            }
-        }
+//        if (this.thread != null) {
+//            if (thread.isAlive()) {
+//                thread.interrupt();
+//                thread = null;
+//            }
+//        }
 
         super.onDestroy();
     }

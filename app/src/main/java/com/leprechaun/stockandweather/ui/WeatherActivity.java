@@ -51,7 +51,7 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherActivi
     private ImageView imageCurrentCondition;
     private ListView listPrevision;
 
-    private WeatherFragment retainedFragment;
+    private static volatile WeatherFragment retainedFragment;
     private static WeatherActivity instance;
     private static volatile RunnableWeatherData runnableWeatherData;
     private GestureDetector gestureDetector;
@@ -86,11 +86,13 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherActivi
         imageCurrentCondition = (ImageView) findViewById(R.id.imageCurrentCondiction);
         listPrevision = (ListView) findViewById(R.id.listPrevision);
 
-        retainedFragment = getRetainedFragment();
+        if (retainedFragment == null)
+            retainedFragment = getRetainedFragment();
 
         if (retainedFragment == null) {
-            retainedFragment = createRetainedFragment();
-            setRetainedFragment(retainedFragment);
+            WeatherFragment tempFragment = createRetainedFragment();
+            setRetainedFragment(tempFragment);
+            retainedFragment = tempFragment;
         } else {
             setLastWeatherUpdate(retainedFragment.getWeather());
         }
@@ -115,8 +117,9 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherActivi
         {
             case R.id.menu_item_refresh:
                 deleteRetainedFragment();
-                retainedFragment = createRetainedFragment();
-                setRetainedFragment(retainedFragment);
+                WeatherFragment tempFragment = createRetainedFragment();
+                setRetainedFragment(tempFragment);
+                retainedFragment = tempFragment;
                 return true;
 
             default:
@@ -191,7 +194,7 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherActivi
         if (lastWeatherUpdate != null) {
 
             WeatherCurrentCondition currentCondition = lastWeatherUpdate.getCurrentCondition();
-           instance.textCity.setText(lastWeatherUpdate.getCity());
+            instance.textCity.setText(lastWeatherUpdate.getCity());
 
             if(currentCondition != null) {
 
@@ -219,20 +222,11 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherActivi
                         instance.listPrevision.setAdapter(adapter);
                     }
                 }
-
-                instance.layoutWeatherInfo.setVisibility(View.VISIBLE);
             }
-            else
-            {
-                showError();
-            }
-        }
-        else
-        {
-            showError();
-        }
 
-        closeProcessDialog();
+            instance.layoutWeatherInfo.setVisibility(View.VISIBLE);
+            closeProcessDialog();
+        }
     }
 
     public void showToast(final @StringRes int id)
@@ -249,8 +243,6 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherActivi
         FragmentManager fm = getFragmentManager();
         ProgressDialogFragment dialogFragment = ProgressDialogFragment.newInstance(R.string.dialog_wait_message, false, false);
         dialogFragment.show(fm, retainedProcess);
-
-
     }
 
     private ProgressDialogFragment getProcessDialog() {
@@ -266,9 +258,6 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherActivi
     }
 
     private WeatherFragment createRetainedFragment() {
-
-        if(runnableWeatherData != null)
-            runnableWeatherData.cancel();
 
         runnableWeatherData = new RunnableWeatherData(this);
         retainedFragment = new WeatherFragment(runnableWeatherData);
